@@ -11,7 +11,7 @@ public class Test : MonoBehaviour
     void Start()
     {
         mesh = GetComponent<MeshFilter>().mesh;
-        CreateCube();
+
     }
     // Update is called once per frame
     void Update()
@@ -71,5 +71,18 @@ public class Test : MonoBehaviour
         }
         return false;
     }
+    //void AddBeam(Beam beam)
+    //{
+    //    int trIndex = vertices.Count;
+
+    //    vertices.Add(beam.direction.from); // Vector3
+    //    vertices.Add(beam.direction.to); // Vector3
+    //    vertices.Add(beam.dataVertex); // Vector3
+    //    mesh.SetVertices(vertices);
+
+    //    triangles.AddRange(Enumerable.Range(trIndex, 3));
+    //    mesh.SetTriangles(triangles, 0);
+    //}
+
 
 }
