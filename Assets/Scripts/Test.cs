@@ -11,6 +11,7 @@ public class Test : MonoBehaviour
     void Start()
     {
         mesh = GetComponent<MeshFilter>().mesh;
+        //CreateCube();
 
     }
     // Update is called once per frame

@@ -12,13 +12,13 @@ public class MeshExtrude : MonoBehaviour
 
     private List<Mesh> listMech;
     private Vector3[] normals;
-    public Edge[] edge;
 
     //debug test 
     public Vector3[] ar1;
     public Vector3[] ar2;
     public Vector3[] ar3;
-    public int[] triangles;
+    public int[] triangle;
+    public int[] edges;
 
     // Start is called before the first frame update
     void Start()
@@ -53,11 +53,18 @@ public class MeshExtrude : MonoBehaviour
 
 
         GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
-        triangles = GetComponent<MeshFilter>().mesh.triangles;
         ar3 = GetComponent<MeshFilter>().mesh.vertices;
+        triangle = GetComponent<MeshFilter>().mesh.triangles;
 
-        CennectMeshes();
-        FindEdge();
+        edges = GetEdges(triangle, ar3).ToArray();
+
+
+    }
+    void Update()
+    {
+        gameObject.GetComponent<MeshFilter>().mesh.triangles = triangle;
+        gameObject.GetComponent<MeshFilter>().mesh.vertices = ar3;
+        
     }
 
     void CreateFlatServeseMesh(Mesh mech)
@@ -65,27 +72,6 @@ public class MeshExtrude : MonoBehaviour
         //Mesh cloneMech = new Mesh();
 
         //listGameObjects.Add(cloneMech);
-    }
-
-    void CombinerMesh(GameObject[] meshes)
-    {
-        MeshFilter[] meshFilters = new MeshFilter[meshes.Length];
-        for (int m = 0; m < meshes.Length; m++)
-        {
-            meshFilters = meshes[m].GetComponentsInChildren<MeshFilter>();
-        }
-        CombineInstance[] combine = new CombineInstance[meshFilters.Length];
-        int i = 0;
-        while (i < meshFilters.Length)
-        {
-            combine[i].mesh = meshFilters[i].sharedMesh;
-            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-            //meshFilters[i].gameObject.SetActive(false);
-            i++;
-        }
-        gameObject.GetComponent<MeshFilter>().mesh = new Mesh();
-        gameObject.GetComponent<MeshFilter>().mesh.CombineMeshes(combine, true, true);
-        //transform.gameObject.active = true;
     }
 
     Mesh CombinerMesh(in Mesh origin, in Mesh addition)
@@ -111,17 +97,47 @@ public class MeshExtrude : MonoBehaviour
         return mesh;
     }
 
+
+    List<int> GetEdges(int[] triangle, Vector3[] vertices)
+    {
+        List<int> edges = new List<int>();
+        
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            int occurrences = triangle.Count(x => x == i);
+            if (occurrences < 5)
+            {
+                edges.Add(i);
+            }
+        }
+        return edges;
+    }
     void CennectMeshes()
     {
-        List<int> triangles;
+        List<int> trianglesList = new List<int>();
+        int[] oneTriangel = new int[3];
 
+        for (int i = 0; i < oneTriangel.Length; i++)
+        {
 
-
-
+        }
     }
 
-    void FindEdge()
-    {
-       GetEdgesOfMesh.BuildManifoldEdges(gameObject.GetComponent<MeshFilter>().mesh);
-    }
+    /*
+    punten kontroleren welke moeten aan elkaar moet worden gezet.
+    die controleer je met de array van waar je een clone hebt van gemaakt en pakt die indsex
+    die tel je er bij de array wat als eerste obejct toe je nog geen mesh was toe gevoegt
+
+    array first object              dit kan ook een int zijn van de lengte van de array.
+    array flat serves
+    array flat serves clone 
+    array end object                dit kan ook een int zijn van de lengte van de array.
+
+    zet je bij de triangels 3 niewe int 
+    [0] index flat serves
+    [1] om de buer point te zoeken moet ik nog even over na denken
+    [2] index flat serves clone + first obect
+
+ */
+
 }
