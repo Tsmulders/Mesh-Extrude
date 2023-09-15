@@ -112,7 +112,7 @@ public class MeshExtrude : MonoBehaviour
         }
         return edges;
     }
-    void CennectMeshes()
+    void CennectMeshes(int[] edgePoints)
     {
         List<int> trianglesList = new List<int>();
         int[] oneTriangel = new int[3];
@@ -121,6 +121,7 @@ public class MeshExtrude : MonoBehaviour
         {
 
         }
+        trianglesList.AddRange(oneTriangel);
     }
 
     /*
