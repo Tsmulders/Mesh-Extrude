@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 public class MeshExtrude : MonoBehaviour
 {
 
-    private Mesh mesh;
+    private Mesh mesh; 
     private Mesh mesh2;
 
     private List<Mesh> listMech;
