@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -52,19 +53,28 @@ public class MeshExtrude : MonoBehaviour
         //CreateFlatServeseMesh(mesh2);
 
 
-        GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
+        mesh = GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
         ar3 = GetComponent<MeshFilter>().mesh.vertices;
         triangle = GetComponent<MeshFilter>().mesh.triangles;
 
-        edges = GetEdges(triangle, ar3).ToArray();
+        edges = GetEdges(triangle, ar1).ToArray(); //ar3 gebruiken voor de hele mech ar1 voor eerste mech.
 
+        triangle = GetComponent<MeshFilter>().mesh.triangles =  CennectMeshes(edges).ToArray();
 
+        RecalculateMesh();
     }
     void Update()
     {
         gameObject.GetComponent<MeshFilter>().mesh.triangles = triangle;
-        gameObject.GetComponent<MeshFilter>().mesh.vertices = ar3;
+        gameObject.GetComponent<MeshFilter>().mesh.vertices = ar3; 
         
+    }
+
+    void RecalculateMesh()
+    {
+        mesh2.RecalculateNormals();
+        mesh2.RecalculateTangents();
+        mesh2.RecalculateBounds();
     }
 
     Mesh CombinerMesh(in Mesh origin, in Mesh addition)
@@ -98,23 +108,64 @@ public class MeshExtrude : MonoBehaviour
         for (int i = 0; i < vertices.Length; i++)
         {
             int occurrences = triangle.Count(x => x == i);
-            if (occurrences < 5)
+            if ((occurrences > 0 && occurrences < 5) || (occurrences > 7 && occurrences < 17))
             {
                 edges.Add(i);
             }
         }
         return edges;
     }
-    void CennectMeshes(int[] edgePoints)
+
+    List<int> CennectMeshes(int[] edgePoints)
     {
         List<int> trianglesList = new List<int>();
         int[] oneTriangel = new int[3];
+        trianglesList.AddRange(mesh.triangles);
 
-        for (int i = 0; i < oneTriangel.Length; i++)
+        //oneTriangel[0] = 440;
+        //oneTriangel[1] = 3;
+        //oneTriangel[2] = 2;
+        //trianglesList.AddRange(oneTriangel);
+
+        //oneTriangel[0] = 440;
+        //oneTriangel[1] = 2;
+        //oneTriangel[2] = 439;
+        //trianglesList.AddRange(oneTriangel);
+
+        //oneTriangel[0] = 5 + ar1.Length - 2;
+        //oneTriangel[1] = 5;
+        //oneTriangel[2] = 3;
+        //trianglesList.AddRange(oneTriangel);
+
+        //oneTriangel[0] = 5 + ar1.Length - 2;
+        //oneTriangel[1] = 3;
+        //oneTriangel[2] = 3 + ar1.Length - 2;
+        //trianglesList.AddRange(oneTriangel);
+
+        //oneTriangel[0] = 124 + ar1.Length - 2;
+        //oneTriangel[1] = 124;
+        //oneTriangel[2] = 115;
+        //trianglesList.AddRange(oneTriangel);
+
+        //oneTriangel[0] = 124 + ar1.Length - 2;
+        //oneTriangel[1] = 115;
+        //oneTriangel[2] = 115 + ar1.Length - 2;
+        //trianglesList.AddRange(oneTriangel);
+
+
+        for (int i = 0; i < edgePoints.Length - 1; i++)
         {
+            oneTriangel[0] = edgePoints[i + 1] + ar1.Length - 2;
+            oneTriangel[1] = edgePoints[i + 1];
+            oneTriangel[2] = edgePoints[i];
+            trianglesList.AddRange(oneTriangel);
 
+            oneTriangel[0] = edgePoints[i + 1] + ar1.Length - 2;
+            oneTriangel[1] = edgePoints[i];
+            oneTriangel[2] = edgePoints[i] + ar1.Length - 2;
+            trianglesList.AddRange(oneTriangel);
         }
-        trianglesList.AddRange(oneTriangel);
+        return trianglesList;
     }
 
     /*
@@ -129,8 +180,8 @@ public class MeshExtrude : MonoBehaviour
 
     zet je bij de triangels 3 niewe int 
     [0] index flat serves
-    [1] om de buer point te zoeken moet ik nog even over na denken
-    [2] index flat serves clone + first obect
+    [1] om de 2 point te zoeken moet ik nog even over na denken
+    [2] index flat serves clone + first obect - 2
 
  */
 

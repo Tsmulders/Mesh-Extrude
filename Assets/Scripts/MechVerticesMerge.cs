@@ -7,18 +7,20 @@ using UnityEngine;
 public class MechVerticesMerge : MonoBehaviour
 {
     Mesh _mesh;
-    
+
+    public float threshold = 0.02f;
 
     // Start is called before the first frame update
     void Start()
     {
         _mesh = gameObject.GetComponent<MeshFilter>().mesh;
-        AutoWeld(_mesh, 0.01f);
+        AutoWeld(_mesh, threshold);
     }
 
     // Update is called once per frame
     void Update()
     {
+        
         
     }
 
