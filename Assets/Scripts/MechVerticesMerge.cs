@@ -22,25 +22,6 @@ public class MechVerticesMerge : MonoBehaviour
         
     }
 
-    //private void VerticesWeld(Mesh mesh, float overflow)
-    //{
-    //    Vector3[] vertices = mesh.vertices;
-
-    //    for (int i = 0; i < vertices.Length; i++)
-    //    {
-    //        for (int j = 0; j < vertices.Length; j++)
-    //        {
-    //            if (Vector3.Distance(vertices[i], vertices[j]) <= overflow)
-    //            {
-    //                vertices[j] = vertices[i];
-    //            }
-    //        }
-    //    }
-
-    //    mesh.vertices = vertices;
-    //    mesh.RecalculateBounds();
-    //}
-
     private void AutoWeld(Mesh mesh, float threshold)
     {
         Vector3[] verts = mesh.vertices;
