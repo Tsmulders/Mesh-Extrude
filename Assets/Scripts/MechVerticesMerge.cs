@@ -1,17 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MechVerticesMerge : MonoBehaviour
 {
-    Mesh mesh;
+    Mesh _mesh;
     
 
     // Start is called before the first frame update
     void Start()
     {
-        mesh = gameObject.GetComponent<MeshFilter>().mesh;
-        AutoWeld(mesh, 0.3f);
+        _mesh = gameObject.GetComponent<MeshFilter>().mesh;
+        AutoWeld(_mesh, 0.01f);
     }
 
     // Update is called once per frame
@@ -20,25 +22,24 @@ public class MechVerticesMerge : MonoBehaviour
         
     }
 
-    private void VerticesWeld(Mesh mesh, float overflow)
-    {
-        Vector3[] vertices = mesh.vertices;
+    //private void VerticesWeld(Mesh mesh, float overflow)
+    //{
+    //    Vector3[] vertices = mesh.vertices;
 
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            for (int j = 0; j < vertices.Length; j++)
-            {
-                if (Vector3.Distance(vertices[i], vertices[j]) <= overflow)
-                {
-                    vertices[j] = vertices[i];
+    //    for (int i = 0; i < vertices.Length; i++)
+    //    {
+    //        for (int j = 0; j < vertices.Length; j++)
+    //        {
+    //            if (Vector3.Distance(vertices[i], vertices[j]) <= overflow)
+    //            {
+    //                vertices[j] = vertices[i];
+    //            }
+    //        }
+    //    }
 
-                }
-            }
-        }
-
-        mesh.vertices = vertices;
-        mesh.RecalculateBounds();
-    }
+    //    mesh.vertices = vertices;
+    //    mesh.RecalculateBounds();
+    //}
 
     private void AutoWeld(Mesh mesh, float threshold)
     {
@@ -46,46 +47,58 @@ public class MechVerticesMerge : MonoBehaviour
 
         // Build new vertex buffer and remove "duplicate" verticies
         // that are within the given threshold.
-        List<Vector3> newVerts = new List<Vector3>();
+        List<int> newVerts = new List<int>();
         List<Vector2> newUVs = new List<Vector2>();
 
-        int k = 0;
-        newVerts.AddRange(mesh.vertices);
+        //mesh.GetVertices(newVerts); //newVerts.AddRange(mesh.vertices);
         for (int i = 0; i < verts.Length; i++)
         {
             // Has vertex already been added to newVerts list?
 
-            foreach (Vector3 newVert in newVerts)
-                if (Vector3.Distance(newVert, verts[i]) <= threshold)
-                    goto skipToNext;
-                // Accept new vertex!
-                newVerts.Add(verts[i]);
-                newUVs.Add(mesh.uv[i]);
-
-            skipToNext:;
+            for (int j = 0; j < verts.Length; j++)
+            {
+                float distance = Vector3.Distance(verts[i], verts[j]);
+                if (distance <= threshold)
+                {
+                    if(!newVerts.Contains(j) && i != j )
+                    {
+                        // Accept new vertex!
+                        newVerts.Add(j);
+                        newUVs.Add(mesh.uv[i]);
+                    }
+                    
+                }
+                
+            }
         }
 
         // Rebuild triangles using new verticies
         int[] tris = mesh.triangles;
-        for (int i = 0; i < tris.Length; ++i)
+        for (int i = 0; i < newVerts.Count; i++)
         {
             // Find new vertex point from buffer
-            for (int j = 0; j < newVerts.Count; ++j)
+            for (int j = 0; j < newVerts.Count; j++)
             {
-                if (Vector3.Distance(newVerts[j], verts[i]) <= threshold)
+                float distance = Vector3.Distance(verts[newVerts[j]], verts[newVerts[i]]);
+                if (distance <= threshold)
                 {
-                    tris[j] = i;
-                    break; 
+                    for (int k = 0; k < tris.Length; k++)
+                    {
+                        if (tris[k] == newVerts[j])
+                        {
+                            tris[k] = newVerts[i];
+                        }
+                    }
                 }
             }
 
         }
-        // Update mesh!*
-        mesh.Clear();
-        mesh.vertices = newVerts.ToArray();
+        // Update mesh!
+        //mesh.vertices = newVerts.ToArray();
         mesh.triangles = tris;
         mesh.uv = newUVs.ToArray();
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
     }
 }

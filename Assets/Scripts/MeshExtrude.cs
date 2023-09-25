@@ -67,13 +67,6 @@ public class MeshExtrude : MonoBehaviour
         
     }
 
-    void CreateFlatServeseMesh(Mesh mech)
-    {
-        //Mesh cloneMech = new Mesh();
-
-        //listGameObjects.Add(cloneMech);
-    }
-
     Mesh CombinerMesh(in Mesh origin, in Mesh addition)
     {
         //MeshFilter[] meshFilters = new MeshFilter[meshes.Length];
