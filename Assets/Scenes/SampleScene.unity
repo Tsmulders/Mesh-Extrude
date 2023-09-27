@@ -547,7 +547,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edec24257fbcf4a478f43ff1d28259d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  threshold: 0.03
+  threshold: 0.035
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

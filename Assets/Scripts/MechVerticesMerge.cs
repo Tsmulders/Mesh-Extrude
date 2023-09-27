@@ -8,7 +8,7 @@ public class MechVerticesMerge : MonoBehaviour
 {
     Mesh _mesh;
 
-    public float threshold = 0.02f;
+    public float threshold = 0.03f;
 
     // Start is called before the first frame update
     void Start()
@@ -45,8 +45,9 @@ public class MechVerticesMerge : MonoBehaviour
                 {
                     if(!newVerts.Contains(j) && i != j )
                     {
-                        // Accept new vertex!
+                        //Accept new vertex!
                         newVerts.Add(j);
+                        
                         newUVs.Add(mesh.uv[i]);
                     }
                     
@@ -57,6 +58,8 @@ public class MechVerticesMerge : MonoBehaviour
 
         // Rebuild triangles using new verticies
         int[] tris = mesh.triangles;
+        List<int> vertexdel = new List<int>();
+
         for (int i = 0; i < newVerts.Count; i++)
         {
             // Find new vertex point from buffer
@@ -70,18 +73,31 @@ public class MechVerticesMerge : MonoBehaviour
                         if (tris[k] == newVerts[j])
                         {
                             tris[k] = newVerts[i];
+                            if(!vertexdel.Contains(i))
+                            vertexdel.Add(i);
                         }
                     }
                 }
             }
-
         }
+
+        List<Vector3> niewverts = verts.ToList();
+        vertexdel.Sort();
+        for (int i = vertexdel.Count -1; i > 0; i--)
+        {
+
+            int ti = vertexdel[i];
+            if(niewverts.Count<= ti|| 0 > ti) { Debug.Log(ti+" "+ niewverts.Count); }
+            niewverts.RemoveAt(ti);
+            
+        }
+
         // Update mesh!
-        //mesh.vertices = newVerts.ToArray();
+        mesh.vertices = niewverts.ToArray();
         mesh.triangles = tris;
-        mesh.uv = newUVs.ToArray();
+        //mesh.uv = newUVs.ToArray();
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
-        mesh.RecalculateNormals();
+        //mesh.RecalculateNormals();
     }
 }

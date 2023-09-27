@@ -7,20 +7,145 @@ using UnityEngine;
 
 public class GetEdgesOfMesh : MonoBehaviour
 {
-    public static List<int> GetEdges(int[] triangle)
-    {
-        List<int> edges = new List<int>();
+    public Mesh mesh;
 
-        for (int i = 0; i < triangle.Length; i++)
+    public static List<Edge> GetEdge(Mesh mesh)
+    {
+        Vector3[] points = mesh.vertices; // The mesh’s vertices
+        int[] indicies = mesh.triangles; // The mesh’s triangle indicies
+
+        List<Edge> edges = new List<Edge>();
+
+        // for every two triangle indicies
+        for (int i = 0; i < indicies.Length - 1; i += 3)
         {
-            int occurrences = triangle.Count(x => x == i);
-            if (occurrences < 5)
+            // if point a != point b (meaning there is an edge)
+            if (points[indicies[i]] != points[indicies[i + 1]])
             {
-                edges.Add(i);
+                // Create a new edge with the corresponding points
+                // and add it to edge list
+                Edge edge = new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]);
+                Edge edge1 = new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]);
+                Edge edge2 = new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]);
+
+                bool found = false;
+                bool found1 = false;
+                bool found2 = false;
+                foreach (Edge e in edges)
+                {
+                    if (e.AlmostEqual(edge))
+                    {
+                        found = true;
+
+                        edges.Remove(e);
+                        break;
+                    }
+                }
+                foreach (Edge e in edges)
+                {
+                    if (e.AlmostEqual(edge1))
+                    {
+                        found1 = true;
+                        edges.Remove(e);
+                        break;
+                    }
+                }
+                foreach (Edge e in edges)
+                {
+                    if (e.AlmostEqual(edge2))
+                    {
+                        found2 = true;
+                        edges.Remove(e);
+                        break;
+                    }
+                }
+                if (!found) edges.Add(edge);
+                if (!found1) edges.Add(edge1);
+                if (!found2) edges.Add(edge2);
             }
+        }
+
+        foreach (Edge edge in edges)
+        {
+            edge.Draw();
         }
         return edges;
     }
+
+    private static List<Vector3> GetStraightEdges(List<Edge> edges)
+    {
+        List<Edge> straightEdges = new List<Edge>();
+
+        foreach (Edge edge in edges)
+        {
+            if (edge.A.x == edge.B.x ||
+            edge.A.y == edge.B.y)
+            {
+                // edge is straight and not diagonal
+                straightEdges.Add(edge);
+            }
+            else
+            {
+                // edge is diagonal and can be discarded
+            }
+        }
+
+        List<Vector3> redPoints = GetPoints(straightEdges);
+        return redPoints;
+    }
+
+    private static List<Vector3> GetPoints(List<Edge> straightEdges)
+    {
+        List<Vector3> Points = new List<Vector3>();
+
+        foreach (Edge edge in straightEdges)
+        {
+            Points.Add(edge.A);
+            Points.Add(edge.B);
+        }
+
+        return Points;
+    }
+}
+
+public class Edge
+{
+    public Vector3 A;
+    public Vector3 B;
+    public int indexA;
+    public int indexB;
+
+    // Creates an object that represents
+    // a line from A to B (an edge)
+    public Edge(Vector3 a, Vector3 b, int inA, int inB)
+    {
+        A = a;
+        B = b;
+        indexA = inA;
+        indexB = inB;
+    }
+    public void Draw()
+    {
+        Debug.DrawLine(A, B, UnityEngine.Color.red, 1000);
+    }
+    public bool AlmostEqual(Edge b)
+    {
+        //vergelijken met epsilon   Mathf.Epsilon  
+        bool equal = false;
+
+        if (check(this.A, b.A) &&
+            check(this.B, b.B) ||
+            check(this.A, b.B) &&
+            check(this.B, b.A)) return true;
+
+        return equal;
+    }
+
+    public bool check(Vector3 v1, Vector3 v2)
+    {
+        return Mathf.Abs(Vector3.Distance(v1, v2)) <= Mathf.Epsilon;
+    }
+
 }
 
 
