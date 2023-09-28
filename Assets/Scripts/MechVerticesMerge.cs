@@ -6,25 +6,7 @@ using UnityEngine;
 
 public class MechVerticesMerge : MonoBehaviour
 {
-    Mesh _mesh;
-
-    public float threshold = 0.03f;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        _mesh = gameObject.GetComponent<MeshFilter>().mesh;
-        AutoWeld(_mesh, threshold);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-        
-    }
-
-    private void AutoWeld(Mesh mesh, float threshold)
+    public static void AutoWeld(Mesh mesh, float threshold)
     {
         Vector3[] verts = mesh.vertices;
 
@@ -43,11 +25,11 @@ public class MechVerticesMerge : MonoBehaviour
                 float distance = Vector3.Distance(verts[i], verts[j]);
                 if (distance <= threshold)
                 {
-                    if(!newVerts.Contains(j) && i != j )
+                    if(!newVerts.Contains(j) && i != j)
                     {
                         //Accept new vertex!
                         newVerts.Add(j);
-                        
+
                         newUVs.Add(mesh.uv[i]);
                     }
                     
@@ -85,7 +67,6 @@ public class MechVerticesMerge : MonoBehaviour
         vertexdel.Sort();
         for (int i = vertexdel.Count -1; i > 0; i--)
         {
-
             int ti = vertexdel[i];
             if(niewverts.Count<= ti|| 0 > ti) { Debug.Log(ti+" "+ niewverts.Count); }
             niewverts.RemoveAt(ti);
@@ -99,5 +80,6 @@ public class MechVerticesMerge : MonoBehaviour
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
         //mesh.RecalculateNormals();
+        mesh.RecalculateUVDistributionMetrics();
     }
 }
