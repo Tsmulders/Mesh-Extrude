@@ -19,49 +19,51 @@ public class GetEdgesOfMesh : MonoBehaviour
         // for every two triangle indicies
         for (int i = 0; i < indicies.Length - 1; i += 3)
         {
+            // Create a new edge with the corresponding points
+            // and add it to edge list
+            Edge edge = new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]);
+            Edge edge1 = new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]);
+            Edge edge2 = new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]);
+
+            bool found = false;
+            bool found1 = false;
+            bool found2 = false;
+            foreach (Edge e in edges)
+            {
+                if (e.AlmostEqual(edge))
+                {
+                    found = true;
+
+                    edges.Remove(e);
+                    break;
+                }
+            }
+            foreach (Edge e in edges)
+            {
+                if (e.AlmostEqual(edge1))
+                {
+                    found1 = true;
+                    edges.Remove(e);
+                    break;
+                }
+            }
+            foreach (Edge e in edges)
+            {
+                if (e.AlmostEqual(edge2))
+                {
+                    found2 = true;
+                    edges.Remove(e);
+                    break;
+                }
+            }
+            if (!found) edges.Add(edge);
+            if (!found1) edges.Add(edge1);
+            if (!found2) edges.Add(edge2);
+
             // if point a != point b (meaning there is an edge)
             if (points[indicies[i]] != points[indicies[i + 1]])
             {
-                // Create a new edge with the corresponding points
-                // and add it to edge list
-                Edge edge = new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]);
-                Edge edge1 = new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]);
-                Edge edge2 = new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]);
-
-                bool found = false;
-                bool found1 = false;
-                bool found2 = false;
-                foreach (Edge e in edges)
-                {
-                    if (e.AlmostEqual(edge))
-                    {
-                        found = true;
-
-                        edges.Remove(e);
-                        break;
-                    }
-                }
-                foreach (Edge e in edges)
-                {
-                    if (e.AlmostEqual(edge1))
-                    {
-                        found1 = true;
-                        edges.Remove(e);
-                        break;
-                    }
-                }
-                foreach (Edge e in edges)
-                {
-                    if (e.AlmostEqual(edge2))
-                    {
-                        found2 = true;
-                        edges.Remove(e);
-                        break;
-                    }
-                }
-                if (!found) edges.Add(edge);
-                if (!found1) edges.Add(edge1);
-                if (!found2) edges.Add(edge2);
+                
             }
         }
 

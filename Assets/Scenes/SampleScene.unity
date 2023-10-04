@@ -432,6 +432,7 @@ MonoBehaviour:
   ar2: []
   ar3: []
   triangle: 
+  threshold: 0.035
 --- !u!4 &1151388027456677490
 Transform:
   m_ObjectHideFlags: 0
@@ -533,6 +534,7 @@ MonoBehaviour:
   ar2: []
   ar3: []
   triangle: 
+  threshold: 3
 --- !u!114 &8164078559660307787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -545,7 +547,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edec24257fbcf4a478f43ff1d28259d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  threshold: 0.035
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

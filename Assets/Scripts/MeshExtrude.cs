@@ -22,18 +22,28 @@ public class MeshExtrude : MonoBehaviour
     public int[] triangle;
     public List<Edge> edges = new List<Edge>();
 
-    public float threshold = 0.035f;
+    public float threshold = 0.0001f;
+    public float extrudeStrength = 0;
 
     // Start is called before the first frame update
     void Start()
     {
+
         listMech = new List<Mesh>();
         mesh = GetComponent<MeshFilter>().mesh;
         listMech.Add(mesh);
 
-        MechVerticesMerge.AutoWeld(mesh, threshold);
+        float furthestDistance = furtherPoint(mesh);
+        threshold = furthestDistance / 500;
+        extrudeStrength = furthestDistance / 50;
 
-        mesh2 = clonemesh(mesh);
+        MechVerticesMerge2_0.AutoWeld(mesh, threshold);
+
+        mesh = GetComponent<MeshFilter>().mesh;
+
+        Debug.Log(mesh.vertices);
+
+        mesh2 = clonemesh(mesh, extrudeStrength);
 
         edges = GetEdgesOfMesh.GetEdge(mesh);
 
@@ -45,24 +55,27 @@ public class MeshExtrude : MonoBehaviour
 
         triangle = gameObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(edges).ToArray();
 
-        RecalculateMesh();
+        mesh = GetComponent<MeshFilter>().mesh;
+
+        RecalculateMesh(mesh);
     }
 
     void Update()
     {
         //gameObject.GetComponent<MeshFilter>().mesh.triangles = triangle;
-        //gameObject.GetComponent<MeshFilter>().mesh.vertices = ar3;
+        gameObject.GetComponent<MeshFilter>().mesh.vertices = ar3;
 
     }
 
-    void RecalculateMesh()
+    void RecalculateMesh(Mesh meshRecalculate)
     {
-        mesh2.RecalculateNormals();
-        mesh2.RecalculateTangents();
-        mesh2.RecalculateBounds();
+        meshRecalculate.RecalculateNormals();
+        meshRecalculate.RecalculateTangents();
+        meshRecalculate.RecalculateBounds();
+        meshRecalculate.RecalculateUVDistributionMetrics();
     }
 
-    private Mesh clonemesh(Mesh original)
+    private Mesh clonemesh(Mesh original, float extrudeStrength)
     {
         Mesh clone = new Mesh();
         Vector3[] vertices = original.vertices;
@@ -70,7 +83,7 @@ public class MeshExtrude : MonoBehaviour
 
         for (int i = 0; i < clone.vertices.Length; i++)
         {
-            vertices[i] = original.vertices[i] + -original.normals[i] * 0.2f;
+            vertices[i] = original.vertices[i] + -original.normals[i] * extrudeStrength;
         }
 
         clone.vertices = vertices;
@@ -101,14 +114,8 @@ public class MeshExtrude : MonoBehaviour
         Mesh mesh = new Mesh();
         mesh.CombineMeshes(combine, true, false, false);
 
-        //gameObject.GetComponent<MeshFilter>().mesh = new Mesh();
-        //gameObject.GetComponent<MeshFilter>().mesh.CombineMeshes(combine, true, true);
-        //transform.gameObject.active = true;
         return mesh;
     }
-
-
-
 
     List<int> CennectMeshes(List<Edge> edgePoints)
     {
@@ -118,23 +125,19 @@ public class MeshExtrude : MonoBehaviour
         //calculate the new triangles
         for (int i = 0; i < edgePoints.Count; i++)
         {
-            //if (edgePoints[i].indexA == edgePoints[i].indexB)
-            //{
-            //    i++;
-            //    int a = edgePoints[i].indexA;
-            //    int b = edgePoints[i].indexB;
-            //    edgePoints[i].indexA = b;
-            //    edgePoints[i].indexB = a;
-            //}
-            
-            oneTriangel[0] = edgePoints[i].indexB + ar1.Length - 2;
+            if (edgePoints[i].indexA == edgePoints[i].indexB)
+            {
+                //i++;
+            }
+
+            oneTriangel[0] = edgePoints[i].indexB + ar1.Length;
             oneTriangel[1] = edgePoints[i].indexB;
             oneTriangel[2] = edgePoints[i].indexA;
             trianglesList.AddRange(oneTriangel);
 
-            oneTriangel[0] = edgePoints[i].indexB + ar1.Length - 2;
+            oneTriangel[0] = edgePoints[i].indexB + ar1.Length;
             oneTriangel[1] = edgePoints[i].indexA;
-            oneTriangel[2] = edgePoints[i].indexA + ar1.Length - 2;
+            oneTriangel[2] = edgePoints[i].indexA + ar1.Length;
             trianglesList.AddRange(oneTriangel);
 
             //oneTriangel[0] = edgePoints[i].indexA + ar1.Length - 2;
@@ -169,18 +172,39 @@ public class MeshExtrude : MonoBehaviour
 
  */
 
+    float furtherPoint(Mesh mesh)
+    {
+        float furthestDistance = 0;
+        Vector3[] vertices = mesh.vertices;
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            for (int j = 0; j < vertices.Length; j++)
+            {
+                float distance = Vector3.Distance(vertices[i], vertices[j]);
+                if (furthestDistance < distance)
+                {
+                    furthestDistance = distance;
+                }
+            }
+        }
+        return furthestDistance;
+    }
+
+
+
     private void OnDrawGizmos()
     {
         if (mesh)
         {
             for (int i = 0; i < edges.Count; i++)
             {
-                if (i == 7 || i == 9)
+
+                if (edges[i].indexA == edges[i].indexB)
                 {
                     Gizmos.color = Color.yellow;
-                    Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.04f);
+                    Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.05f);
                 }
-                else
+                else 
                 {
 
                 Gizmos.color = Color.green;
