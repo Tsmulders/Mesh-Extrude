@@ -108,6 +108,36 @@ public class GetEdgesOfMesh : MonoBehaviour
 
         return Points;
     }
+
+    public static List<Edge> GetAllEdge(Mesh mesh)
+    {
+        Vector3[] points = mesh.vertices; // The mesh’s vertices
+        int[] indicies = mesh.triangles; // The mesh’s triangle indicies
+
+        List<Edge> edges = new List<Edge>();
+
+        for (int i = 0; i < indicies.Length - 1; i += 3)
+        {
+            Edge edge = new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]);
+            Edge edge1 = new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]);
+            Edge edge2 = new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]);
+
+            if (!edges.Contains(edge))
+            {
+                edges.Add(edge);
+            }
+            if (!edges.Contains(edge1))
+            {
+                edges.Add(edge);
+            }
+            if (!edges.Contains(edge2))
+            {
+                edges.Add(edge);
+            }
+        }
+
+        return edges;
+    }
 }
 
 //public class Edge

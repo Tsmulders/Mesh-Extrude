@@ -6,6 +6,8 @@ using UnityEngine;
 public class Test : MonoBehaviour
 {
     public Mesh mesh;
+    private Mesh mesh2;
+    public GameObject adsfa;
 
     // Start is called before the first frame update
     void Start()
