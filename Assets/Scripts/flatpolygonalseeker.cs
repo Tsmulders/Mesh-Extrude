@@ -15,23 +15,19 @@ public class flatpolygonalseeker : MonoBehaviour
         LooseSurface(mesh);
     }
 
-    void LooseSurface(Mesh mesh)
+    public static int[] LooseSurface(Mesh mesh)
     {
-        MechVerticesMerge2_0.AutoWeld(mesh, 0.0001f);
+        
         List<Edge> edges = new List<Edge>();
         edges = GetEdgesOfMesh.GetEdge(mesh);
         List<Edge> edgesCircle = new List<Edge>();
-        if (edges == null || edges.Count == 0) return;
+        if (edges == null || edges.Count == 0) return null;
         edgesCircle.Add(edges[0]);
-
+        List<int> nietgekozen = new List<int>();
         int j = 0;
         _l2:
         for (int i = 0; i < edges.Count; i++)
         {
-            if (edgesCircle.Count > 2000)
-            {
-                break;
-            }
             if (edges[i].indexA == edges[i].indexB)
             {
                 i++;
@@ -45,14 +41,26 @@ public class flatpolygonalseeker : MonoBehaviour
                     goto _l2;
                 }
             }
+            //nietgekozen.Add(i);
+        }
+        if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
+        {
+            return null;
         }
 
-        if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count -1].indexB)
-        {
-            Debug.Log("het is niet lose");
-            //return;
-        }
-            Debug.Log("het is een lose edge");
+        //if (nietgekozen == null)
+        //{
+        //    return null;
+        //}
+        //if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
+        //{
+        //    edgesCircle.Clear();
+        //    edgesCircle.Add(edges[nietgekozen[0]]);
+        //    nietgekozen.Clear();
+        //}
+
+
+        Debug.Log("lose edge");
 
         //extract all vertices from list
         List<int> indexEdges = new List<int>();
@@ -79,7 +87,7 @@ public class flatpolygonalseeker : MonoBehaviour
             }
         }
 
-        fadfa.AddRange(indexEdges);
+        return indexEdges.ToArray();
     }
     private void OnDrawGizmos()
     {

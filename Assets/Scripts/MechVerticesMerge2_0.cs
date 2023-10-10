@@ -50,7 +50,7 @@ public class MechVerticesMerge2_0 : MonoBehaviour
                     }
                 }
             }
-            if (v.Count > 1) 
+             if (v.Count > 0) 
             {
                 v.Add(i);
                 v.Sort();
@@ -63,7 +63,7 @@ public class MechVerticesMerge2_0 : MonoBehaviour
         if (newVerts.Count == 0) return;
 
         //reassign triangles 
-        for (int i = 0; i < newVerts.Count -1; i++)
+        for (int i = 0; i < newVerts.Count; i++)
         {
             for (int j = 0; j < newVerts[i].Count; j++)
             {

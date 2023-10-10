@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -25,30 +26,39 @@ public class MeshExtrude : MonoBehaviour
     public float threshold = 0.0001f;
     public float extrudeStrength = 0;
 
+    int[] extrudevertex;
+
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
 
         listMech = new List<Mesh>();
         mesh = GetComponent<MeshFilter>().mesh;
-        listMech.Add(mesh);
+
+
 
         float furthestDistance = furtherPoint(mesh);
-        threshold = furthestDistance / 500;
+        //threshold = furthestDistance / 500;
         extrudeStrength = furthestDistance / 50;
 
         MechVerticesMerge2_0.AutoWeld(mesh, threshold);
 
         mesh = GetComponent<MeshFilter>().mesh;
+        ar3 = GetComponent<MeshFilter>().mesh.vertices;
 
-        Debug.Log(mesh.vertices);
+        extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
+        if (extrudevertex == null)
+        {
+            Debug.Log("there are no lose polygons");
+            return;
+        }
 
-        mesh2 = clonemesh(mesh, extrudeStrength);
+        mesh2 = clonemesh(mesh, extrudevertex, extrudeStrength);
 
         edges = GetEdgesOfMesh.GetEdge(mesh);
 
         mesh = GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
-        ar3 = GetComponent<MeshFilter>().mesh.vertices;
+        
 
 
         triangle = GetComponent<MeshFilter>().mesh.triangles;
@@ -58,13 +68,13 @@ public class MeshExtrude : MonoBehaviour
         mesh = GetComponent<MeshFilter>().mesh;
 
         RecalculateMesh(mesh);
+        ar3 = GetComponent<MeshFilter>().mesh.vertices;
     }
 
     void Update()
     {
         //gameObject.GetComponent<MeshFilter>().mesh.triangles = triangle;
         gameObject.GetComponent<MeshFilter>().mesh.vertices = ar3;
-
     }
 
     void RecalculateMesh(Mesh meshRecalculate)
@@ -75,20 +85,49 @@ public class MeshExtrude : MonoBehaviour
         meshRecalculate.RecalculateUVDistributionMetrics();
     }
 
-    private Mesh clonemesh(Mesh original, float extrudeStrength)
+    private Mesh clonemesh(Mesh original, int[] verticesIndex, float extrudeStrength)
     {
+        //om de triangles te krijgen sla ze al op in get edges of mesh
         Mesh clone = new Mesh();
-        Vector3[] vertices = original.vertices;
-        clone.vertices = new Vector3[original.vertices.Length];
-
-        for (int i = 0; i < clone.vertices.Length; i++)
+        List<Vector3> vertices = new List<Vector3>();
+        List<Vector2> uv = new List<Vector2>();
+        List<int> triangles = new List<int>();
+        for (int i = 0; i < verticesIndex.Length; i++)
+        {
+            vertices.Add(original.vertices[verticesIndex[i]]);
+            uv.Add(original.uv[verticesIndex[i]]);
+        }
+        
+        for (int i = 0; i < verticesIndex.Length; i++)
         {
             vertices[i] = original.vertices[i] + -original.normals[i] * extrudeStrength;
         }
 
-        clone.vertices = vertices;
-        clone.uv = original.uv;
-        clone.triangles = original.triangles.Reverse().ToArray();
+        Triangles[] triangles1;
+        triangles1 = GetTriangles.getTrianglesGivenIndex(verticesIndex, original).ToArray();
+
+        for (int i = 0; i < triangles1.Length; i++)
+        {
+            triangles.AddRange(triangles1[i].triangleIndex);
+        }
+
+        //index zit niet meer op de zelfde plaats. daarom kan de triagles het niet vinden.
+
+        //for(int i = 0;i < verticesIndex.Length; i++)
+        //{
+        //    for (int j = 0; j < triangles.Count; j++)
+        //    {
+        //        if (verticesIndex[i] == triangles[j])
+        //        {
+        //            triangles[j] = i;
+        //        }
+        //    }
+        //}
+
+        triangles.Reverse();
+        clone.vertices = vertices.ToArray();
+        clone.uv = uv.ToArray();
+        clone.triangles = triangles.ToArray();
 
         ar1 = original.vertices;
         ar2 = clone.vertices;
@@ -196,19 +235,27 @@ public class MeshExtrude : MonoBehaviour
     {
         if (mesh)
         {
-            for (int i = 0; i < edges.Count; i++)
+            //for (int i = 0; i < edges.Count; i++)
+            //{
+
+            //    if (edges[i].indexA == edges[i].indexB)
+            //    {
+            //        Gizmos.color = Color.yellow;
+            //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.05f);
+            //    }
+            //    else
+            //    {
+
+            //        Gizmos.color = Color.green;
+            //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.04f);
+            //    }
+            //}
+            if (extrudevertex != null)
             {
-
-                if (edges[i].indexA == edges[i].indexB)
+                for (int i = 0; i < extrudevertex.Length; i++)
                 {
-                    Gizmos.color = Color.yellow;
-                    Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.05f);
-                }
-                else 
-                {
-
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.04f);
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[extrudevertex[i]]), 0.005f);
                 }
             }
         }
