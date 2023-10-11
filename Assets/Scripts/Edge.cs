@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Edge
@@ -18,6 +19,7 @@ public class Edge
         indexA = inA;
         indexB = inB;
     }
+
     public void Draw()
     {
         Debug.DrawLine(A, B, UnityEngine.Color.red, 1000);

@@ -128,11 +128,11 @@ public class GetEdgesOfMesh : MonoBehaviour
             }
             if (!edges.Contains(edge1))
             {
-                edges.Add(edge);
+                edges.Add(edge1);
             }
             if (!edges.Contains(edge2))
             {
-                edges.Add(edge);
+                edges.Add(edge2);
             }
         }
 

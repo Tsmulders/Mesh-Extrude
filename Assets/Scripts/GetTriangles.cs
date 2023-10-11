@@ -34,10 +34,10 @@ public class GetTriangles : MonoBehaviour
             {
                 if (alltrianglesList[j].triangleIndex.Contains(vertex[i]))
                 {
-                    //if (!alltrianglesList.Contains(alltrianglesList[j]))
-                    //{
-                    trianglesList.Add(alltrianglesList[j]);
-                    //}
+                    if (!trianglesList.Contains(alltrianglesList[j]))
+                    {
+                        trianglesList.Add(alltrianglesList[j]);
+                    }
                 }
             }
         }

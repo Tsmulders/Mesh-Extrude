@@ -115,10 +115,9 @@ public class MechVerticesMerge2_0 : MonoBehaviour
 
         mesh.triangles = tris.ToArray();
         mesh.vertices = verts.ToArray();
-        //mesh.uv = newUVs.ToArray();
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
-        //mesh.RecalculateNormals();
+        mesh.RecalculateNormals();
         mesh.RecalculateUVDistributionMetrics();
 
     }

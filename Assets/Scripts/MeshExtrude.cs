@@ -38,7 +38,7 @@ public class MeshExtrude : MonoBehaviour
 
 
         float furthestDistance = furtherPoint(mesh);
-        //threshold = furthestDistance / 500;
+        threshold = furthestDistance / 500;
         extrudeStrength = furthestDistance / 50;
 
         MechVerticesMerge2_0.AutoWeld(mesh, threshold);
@@ -53,22 +53,22 @@ public class MeshExtrude : MonoBehaviour
             return;
         }
 
-        mesh2 = clonemesh(mesh, extrudevertex, extrudeStrength);
-
         edges = GetEdgesOfMesh.GetEdge(mesh);
 
-        mesh = GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
+        mesh2 = clonemesh(mesh, extrudevertex, extrudeStrength);
+
+
+       mesh = GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
         
-
-
         triangle = GetComponent<MeshFilter>().mesh.triangles;
+        ar3 = GetComponent<MeshFilter>().mesh.vertices;
 
-        triangle = gameObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(edges).ToArray();
+        triangle = gameObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(edges, extrudevertex).ToArray();
 
         mesh = GetComponent<MeshFilter>().mesh;
 
         RecalculateMesh(mesh);
-        ar3 = GetComponent<MeshFilter>().mesh.vertices;
+        
     }
 
     void Update()
@@ -92,15 +92,16 @@ public class MeshExtrude : MonoBehaviour
         List<Vector3> vertices = new List<Vector3>();
         List<Vector2> uv = new List<Vector2>();
         List<int> triangles = new List<int>();
+        //for (int i = 0; i < verticesIndex.Length; i++)
+        //{
+        //    vertices.Add(original.vertices[verticesIndex[i]]);
+        //    uv.Add(original.uv[verticesIndex[i]]);
+        //}
+
         for (int i = 0; i < verticesIndex.Length; i++)
         {
-            vertices.Add(original.vertices[verticesIndex[i]]);
+            vertices.Add(original.vertices[verticesIndex[i]] + -original.normals[verticesIndex[i]] * extrudeStrength);
             uv.Add(original.uv[verticesIndex[i]]);
-        }
-        
-        for (int i = 0; i < verticesIndex.Length; i++)
-        {
-            vertices[i] = original.vertices[i] + -original.normals[i] * extrudeStrength;
         }
 
         Triangles[] triangles1;
@@ -111,18 +112,20 @@ public class MeshExtrude : MonoBehaviour
             triangles.AddRange(triangles1[i].triangleIndex);
         }
 
-        //index zit niet meer op de zelfde plaats. daarom kan de triagles het niet vinden.
+        //index zit niet meer op de zelfde plaats. daarom kan de triagles het niet vinden. eerst te info finden hoe die moet veranderen en daarna het aanpassen
 
-        //for(int i = 0;i < verticesIndex.Length; i++)
-        //{
-        //    for (int j = 0; j < triangles.Count; j++)
-        //    {
-        //        if (verticesIndex[i] == triangles[j])
-        //        {
-        //            triangles[j] = i;
-        //        }
-        //    }
-        //}
+        List<List<int>> trianglesIndexchange = new List<List<int>>();
+        List<int> Indexchange = new List<int>();
+        for (int i = 0; i < verticesIndex.Length; i++)
+        {
+            for (int j = 0; j < triangles.Count; j++)
+            {
+                if (verticesIndex[i] == triangles[j])
+                {
+                    triangles[j] = i;
+                }
+            }
+        }
 
         triangles.Reverse();
         clone.vertices = vertices.ToArray();
@@ -156,27 +159,45 @@ public class MeshExtrude : MonoBehaviour
         return mesh;
     }
 
-    List<int> CennectMeshes(List<Edge> edgePoints)
+    List<int> CennectMeshes(List<Edge> edgePoints, int[] verticesIndex)
     {
         List<int> trianglesList = new List<int>();
         int[] oneTriangel = new int[3];
         trianglesList.AddRange(mesh.triangles);
+        List<Edge> edgePoints2 = new List<Edge>();
+        
+
+        for (int i = 0; i < edgePoints.Count; i++)
+        {
+            edgePoints2.Add(new Edge(edgePoints[i].A, edgePoints[i].B, edgePoints[i].indexA, edgePoints[i].indexB));
+        }
+
+        for (int i = 0; i < edgePoints2.Count; i++)
+        {
+            for (int j = 0; j < verticesIndex.Length; j++)
+            {
+                if (edgePoints2[i].indexA == verticesIndex[j])
+                {
+                    edgePoints2[i].indexA = j;
+                }
+                if (edgePoints2[i].indexB == verticesIndex[j])
+                {
+                    edgePoints2[i].indexB = j;
+                }
+            }
+        }
+
         //calculate the new triangles
         for (int i = 0; i < edgePoints.Count; i++)
         {
-            if (edgePoints[i].indexA == edgePoints[i].indexB)
-            {
-                //i++;
-            }
-
-            oneTriangel[0] = edgePoints[i].indexB + ar1.Length;
+            oneTriangel[0] = edgePoints2[i].indexB + ar1.Length;
             oneTriangel[1] = edgePoints[i].indexB;
             oneTriangel[2] = edgePoints[i].indexA;
             trianglesList.AddRange(oneTriangel);
 
-            oneTriangel[0] = edgePoints[i].indexB + ar1.Length;
+            oneTriangel[0] = edgePoints2[i].indexB + ar1.Length;
             oneTriangel[1] = edgePoints[i].indexA;
-            oneTriangel[2] = edgePoints[i].indexA + ar1.Length;
+            oneTriangel[2] = edgePoints2[i].indexA + ar1.Length;
             trianglesList.AddRange(oneTriangel);
 
             //oneTriangel[0] = edgePoints[i].indexA + ar1.Length - 2;

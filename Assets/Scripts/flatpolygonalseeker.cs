@@ -86,7 +86,7 @@ public class flatpolygonalseeker : MonoBehaviour
                 goto _l3;
             }
         }
-
+        indexEdges.Sort();
         return indexEdges.ToArray();
     }
     private void OnDrawGizmos()
