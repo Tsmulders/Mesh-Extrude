@@ -27,6 +27,7 @@ public class MeshExtrude : MonoBehaviour
     public float extrudeStrength = 0;
 
     int[] extrudevertex;
+    int countver1;
 
     // Start is called before the first frame update
     void Awake()
@@ -58,7 +59,7 @@ public class MeshExtrude : MonoBehaviour
         mesh2 = clonemesh(mesh, extrudevertex, extrudeStrength);
 
 
-       mesh = GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
+        mesh = GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
         
         triangle = GetComponent<MeshFilter>().mesh.triangles;
         ar3 = GetComponent<MeshFilter>().mesh.vertices;
@@ -92,11 +93,6 @@ public class MeshExtrude : MonoBehaviour
         List<Vector3> vertices = new List<Vector3>();
         List<Vector2> uv = new List<Vector2>();
         List<int> triangles = new List<int>();
-        //for (int i = 0; i < verticesIndex.Length; i++)
-        //{
-        //    vertices.Add(original.vertices[verticesIndex[i]]);
-        //    uv.Add(original.uv[verticesIndex[i]]);
-        //}
 
         for (int i = 0; i < verticesIndex.Length; i++)
         {
@@ -155,7 +151,7 @@ public class MeshExtrude : MonoBehaviour
 
         Mesh mesh = new Mesh();
         mesh.CombineMeshes(combine, true, false, false);
-
+        countver1 = mesh.vertices.Length - addition.vertices.Length;
         return mesh;
     }
 
@@ -165,7 +161,6 @@ public class MeshExtrude : MonoBehaviour
         int[] oneTriangel = new int[3];
         trianglesList.AddRange(mesh.triangles);
         List<Edge> edgePoints2 = new List<Edge>();
-        
 
         for (int i = 0; i < edgePoints.Count; i++)
         {
@@ -190,25 +185,15 @@ public class MeshExtrude : MonoBehaviour
         //calculate the new triangles
         for (int i = 0; i < edgePoints.Count; i++)
         {
-            oneTriangel[0] = edgePoints2[i].indexB + ar1.Length;
+            oneTriangel[0] = edgePoints2[i].indexB + countver1;
             oneTriangel[1] = edgePoints[i].indexB;
             oneTriangel[2] = edgePoints[i].indexA;
             trianglesList.AddRange(oneTriangel);
 
-            oneTriangel[0] = edgePoints2[i].indexB + ar1.Length;
+            oneTriangel[0] = edgePoints2[i].indexB + countver1;
             oneTriangel[1] = edgePoints[i].indexA;
-            oneTriangel[2] = edgePoints2[i].indexA + ar1.Length;
+            oneTriangel[2] = edgePoints2[i].indexA + countver1;
             trianglesList.AddRange(oneTriangel);
-
-            //oneTriangel[0] = edgePoints[i].indexA + ar1.Length - 2;
-            //oneTriangel[1] = edgePoints[i].indexA;
-            //oneTriangel[2] = edgePoints[i].indexB;
-            //trianglesList.AddRange(oneTriangel);
-
-            //oneTriangel[0] = edgePoints[i].indexA + ar1.Length - 2;
-            //oneTriangel[1] = edgePoints[i].indexB;
-            //oneTriangel[2] = edgePoints[i].indexB + ar1.Length - 2;
-            //trianglesList.AddRange(oneTriangel);
         }
         return trianglesList;
     }

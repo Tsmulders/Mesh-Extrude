@@ -9,6 +9,7 @@ public class MechVerticesMerge : MonoBehaviour
     public static void AutoWeld(Mesh mesh, float threshold)
     {
         Vector3[] verts = mesh.vertices;
+        
 
         // Build new vertex buffer and remove "duplicate" verticies
         // that are within the given threshold.
@@ -50,7 +51,6 @@ public class MechVerticesMerge : MonoBehaviour
             // Find new vertex point from buffer
             for (int j = 0; j < newVerts.Count; j++)
             {
-                
                 float distance = Vector3.Distance(verts[newVerts[j]], verts[newVerts[i]]);
                 if (distance <= threshold)
                 {
@@ -82,11 +82,10 @@ public class MechVerticesMerge : MonoBehaviour
         {
             for (int j = 0; j < merchCluster[i].Count; j++)
             {
-            if (!vertexdel.Contains(merchCluster[i][j]))
-            {
-                vertexdel.Add(merchCluster[i][j]);
-            }
-
+                if (!vertexdel.Contains(merchCluster[i][j]))
+                {
+                    vertexdel.Add(merchCluster[i][j]);
+                }
             }
         }
         vertexdel.Sort();
@@ -151,6 +150,7 @@ public class MechVerticesMerge : MonoBehaviour
         mesh.triangles = tris;
         mesh.vertices = niewverts.ToArray();
         //mesh.uv = newUVs.ToArray();
+        
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
         //mesh.RecalculateNormals();

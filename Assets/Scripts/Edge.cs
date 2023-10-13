@@ -22,7 +22,7 @@ public class Edge
 
     public void Draw()
     {
-        Debug.DrawLine(A, B, UnityEngine.Color.red, 1000);
+        Debug.DrawLine(A, B, Color.red, 1000);
     }
     public bool AlmostEqual(Edge b)
     {
