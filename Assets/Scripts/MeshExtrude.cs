@@ -11,7 +11,7 @@ public class MeshExtrude : MonoBehaviour
 {
 
     private Mesh mesh;
-    private Mesh mesh2;
+    
 
     private List<Mesh> listMech;
     private Vector3[] normals;
@@ -26,7 +26,7 @@ public class MeshExtrude : MonoBehaviour
     public float threshold = 0.0001f;
     public float extrudeStrength = 0;
 
-    int[] extrudevertex;
+    ExtrudeData[] extrudevertex;
     int countver1;
 
     // Start is called before the first frame update
@@ -45,10 +45,9 @@ public class MeshExtrude : MonoBehaviour
         MechVerticesMerge2_0.AutoWeld(mesh, threshold);
 
         mesh = GetComponent<MeshFilter>().mesh;
-        ar3 = GetComponent<MeshFilter>().mesh.vertices;
 
         extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
-        if (extrudevertex == null)
+        if (extrudevertex.Length == 0)
         {
             Debug.Log("there are no lose polygons");
             return;
@@ -56,17 +55,21 @@ public class MeshExtrude : MonoBehaviour
 
         edges = GetEdgesOfMesh.GetEdge(mesh);
 
-        mesh2 = clonemesh(mesh, extrudevertex, extrudeStrength);
+        for (int i = 0; i < extrudevertex.Length; i++)
+        {
+            Mesh mesh2;
+            mesh2 = clonemesh(mesh, extrudevertex[i].indexEdges, extrudeStrength);
 
+            mesh = GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
 
-        mesh = GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
-        
-        triangle = GetComponent<MeshFilter>().mesh.triangles;
-        ar3 = GetComponent<MeshFilter>().mesh.vertices;
+            triangle = GetComponent<MeshFilter>().mesh.triangles;
+            ar3 = GetComponent<MeshFilter>().mesh.vertices;
 
-        triangle = gameObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(edges, extrudevertex).ToArray();
+            triangle = gameObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(extrudevertex[i].edgesCircle, extrudevertex[i].indexEdges).ToArray();
 
-        mesh = GetComponent<MeshFilter>().mesh;
+            mesh = GetComponent<MeshFilter>().mesh;
+        }
+
 
         RecalculateMesh(mesh);
         
@@ -90,6 +93,8 @@ public class MeshExtrude : MonoBehaviour
     {
         //om de triangles te krijgen sla ze al op in get edges of mesh
         Mesh clone = new Mesh();
+
+
         List<Vector3> vertices = new List<Vector3>();
         List<Vector2> uv = new List<Vector2>();
         List<int> triangles = new List<int>();
@@ -138,11 +143,6 @@ public class MeshExtrude : MonoBehaviour
 
     Mesh CombinerMesh(in Mesh original, in Mesh addition)
     {
-        //MeshFilter[] meshFilters = new MeshFilter[meshes.Length];
-        //for (int m = 0; m < meshes.Length; m++)
-        //{
-        //    meshFilters = meshes[m].GetComponentsInChildren<MeshFilter>();
-        //}
         CombineInstance[] combine = new CombineInstance[2];
         combine[0].mesh = original;
         combine[0].transform = transform.localToWorldMatrix;
@@ -155,14 +155,14 @@ public class MeshExtrude : MonoBehaviour
         return mesh;
     }
 
-    List<int> CennectMeshes(List<Edge> edgePoints, int[] verticesIndex)
+    List<int> CennectMeshes(Edge[] edgePoints, int[] verticesIndex)
     {
         List<int> trianglesList = new List<int>();
         int[] oneTriangel = new int[3];
         trianglesList.AddRange(mesh.triangles);
         List<Edge> edgePoints2 = new List<Edge>();
 
-        for (int i = 0; i < edgePoints.Count; i++)
+        for (int i = 0; i < edgePoints.Length; i++)
         {
             edgePoints2.Add(new Edge(edgePoints[i].A, edgePoints[i].B, edgePoints[i].indexA, edgePoints[i].indexB));
         }
@@ -183,7 +183,7 @@ public class MeshExtrude : MonoBehaviour
         }
 
         //calculate the new triangles
-        for (int i = 0; i < edgePoints.Count; i++)
+        for (int i = 0; i < edgePoints.Length; i++)
         {
             oneTriangel[0] = edgePoints2[i].indexB + countver1;
             oneTriangel[1] = edgePoints[i].indexB;
@@ -197,25 +197,6 @@ public class MeshExtrude : MonoBehaviour
         }
         return trianglesList;
     }
-
-    /*
-    punten kontroleren welke moeten aan elkaar moet worden gezet.
-    die controleer je met de array van waar je een clone hebt van gemaakt en pakt die indsex
-    die tel je er bij de array wat als eerste obejct toe je nog geen mesh was toe gevoegt
-
-    array first object              dit kan ook een int zijn van de lengte van de array.
-    array flat serves
-    array flat serves clone 
-    array end object                dit kan ook een int zijn van de lengte van de array.
-
-    zet je bij de triangels 3 niewe int 
-    [0] index flat serves
-    [1] om de 2 point te zoeken moet ik nog even over na denken
-    [2] index flat serves clone + first obect - 2
-
-    -2 is voor de 0 van de array af te tellen
-
- */
 
     float furtherPoint(Mesh mesh)
     {
@@ -256,14 +237,14 @@ public class MeshExtrude : MonoBehaviour
             //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.04f);
             //    }
             //}
-            if (extrudevertex != null)
-            {
-                for (int i = 0; i < extrudevertex.Length; i++)
-                {
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[extrudevertex[i]]), 0.005f);
-                }
-            }
+            //if (extrudevertex != null)
+            //{
+            //    for (int i = 0; i < extrudevertex.Length; i++)
+            //    {
+            //        Gizmos.color = Color.green;
+            //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[extrudevertex[i]]), 0.005f);
+            //    }
+            //}
         }
     }
 }

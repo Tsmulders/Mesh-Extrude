@@ -15,50 +15,68 @@ public class flatpolygonalseeker : MonoBehaviour
         LooseSurface(mesh);
     }
 
-    public static int[] LooseSurface(Mesh mesh)
+
+
+    public static ExtrudeData[] LooseSurface(Mesh mesh)
     {
-        
+        List<ExtrudeData> extrude = new List<ExtrudeData>();
+
         List<Edge> edges = new List<Edge>();
+        
         edges = GetEdgesOfMesh.GetEdge(mesh);
         List<Edge> edgesCircle = new List<Edge>();
-        if (edges == null || edges.Count == 0) return null;
+
+        if (edges == null || edges.Count == 0) return extrude.ToArray();
+
         edgesCircle.Add(edges[0]);
-        List<int> nietgekozen = new List<int>();
+        List<int> notChosen = new List<int>();
         int j = 0;
+
+        List<Edge> edgesdone = new List<Edge>();
+        edgesdone.AddRange(edges);
+
         _l2:
-        for (int i = 0; i < edges.Count; i++)
+        for (int i = 0; i < edgesdone.Count; i++)
         {
-            if (edges[i].indexA == edges[i].indexB)
+            if (edges[i].indexA == edgesdone[i].indexB)
             {
                 i++;
             }
-            if (edgesCircle[j].indexB == edges[i].indexA)
+            if (edgesCircle[j].indexB == edgesdone[i].indexA)
             {
-                if (!edgesCircle.Contains(edges[i]))
+                if (!edgesCircle.Contains(edgesdone[i]))
                 {
-                    edgesCircle.Add(edges[i]);
+                    edgesCircle.Add(edgesdone[i]);
                     j++;
                     goto _l2;
                 }
             }
-            //nietgekozen.Add(i);
+            if (!notChosen.Contains(i))
+            {
+                notChosen.Add(i);
+            }
         }
-        if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
-        {
-            return null;
-        }
-
-        //if (nietgekozen == null)
+        //if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
         //{
         //    return null;
         //}
-        //if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
-        //{
-        //    edgesCircle.Clear();
-        //    edgesCircle.Add(edges[nietgekozen[0]]);
-        //    nietgekozen.Clear();
-        //}
 
+        if (notChosen.Count == 0 && edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
+        {
+            return extrude.ToArray();
+        }
+        if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
+        {
+            for (int i = 0; i < edgesCircle.Count; i++)
+            {
+                edgesdone.Remove(edgesCircle[i]);
+            }
+            edgesCircle.Clear();
+            edgesCircle.Add(edgesdone[notChosen[0]]);
+            notChosen.Clear();
+            j = 0;
+             goto _l2;
+        }
 
         Debug.Log("lose edge");
 
@@ -87,8 +105,28 @@ public class flatpolygonalseeker : MonoBehaviour
             }
         }
         indexEdges.Sort();
-        return indexEdges.ToArray();
+
+        extrude.Add(new ExtrudeData(indexEdges, edgesCircle));
+
+        if (notChosen.Count != 0)
+        {
+            for (int i = 0; i < edgesCircle.Count; i++)
+            {
+                edgesdone.Remove(edgesCircle[i]);
+            }
+            edgesCircle.Clear();
+            edgesCircle.Add(edges[notChosen[0]]);
+            notChosen.Clear();
+            indexEdges.Clear();
+            j = 0;
+            goto _l2;
+        }
+
+        return extrude.ToArray();
     }
+
+
+
     private void OnDrawGizmos()
     {
         if (mesh)

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MechVerticesMerge2_0 : MonoBehaviour
 {
-    // Start is called before the first frame update
+    //weld close vertices. that it wil be 1 index.
     public static void AutoWeld(Mesh mesh, float threshold)
     {
         List<Vector3> verts = new List<Vector3>();

@@ -26,7 +26,7 @@ public class Edge
     }
     public bool AlmostEqual(Edge b)
     {
-        //vergelijken met epsilon   Mathf.Epsilon  
+        //vergelijken met epsilon Mathf.Epsilon  
         bool equal = false;
 
         if (check(this.A, b.A) &&

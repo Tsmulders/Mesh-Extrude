@@ -227,15 +227,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 4896ae66024099b48831361597c76367, type: 3}
       propertyPath: m_LocalScale.x
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4896ae66024099b48831361597c76367, type: 3}
       propertyPath: m_LocalScale.y
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4896ae66024099b48831361597c76367, type: 3}
       propertyPath: m_LocalScale.z
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4896ae66024099b48831361597c76367, type: 3}
       propertyPath: m_LocalPosition.x
@@ -284,7 +284,7 @@ PrefabInstance:
     - target: {fileID: -5754084199372789682, guid: 4896ae66024099b48831361597c76367, type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 5302568919011541938, guid: 4896ae66024099b48831361597c76367, type: 3}
+      objectReference: {fileID: 4864056309639282896, guid: e318b580878a5fd41bea39a59d939bb9, type: 3}
     - target: {fileID: 919132149155446097, guid: 4896ae66024099b48831361597c76367, type: 3}
       propertyPath: m_Name
       value: ME_Steve_Cool
