@@ -26,8 +26,6 @@ public class GetEdgesOfMesh : MonoBehaviour
         NativeArray<float3> vertices = new NativeArray<float3>(points.Length, Allocator.TempJob);
         NativeArray<int> triangles = new NativeArray<int>(indicies.Length, Allocator.TempJob);
 
-
-
         List<Edge> edges = new List<Edge>();
 
         for (int i = 0; i < points.Length; i++)
@@ -58,7 +56,33 @@ public class GetEdgesOfMesh : MonoBehaviour
 
         vertices.Dispose();
 
-        edges = edgesJob.edges;
+
+        for (int i = 0; i < indicies.Length - 1; i += 3)
+        {
+            Edge[] edge = new Edge[3];
+            
+            edge[0] = new Edge(vertices[triangles[i]], vertices[triangles[i + 1]], triangles[i], triangles[i + 1]);
+            edge[1] = new Edge(vertices[triangles[i + 1]], vertices[triangles[i + 2]], triangles[i + 1], triangles[i + 2]);
+            edge[2] = new Edge(vertices[triangles[i + 2]], vertices[triangles[i]], triangles[i + 2], triangles[i]);
+
+
+
+
+            for (int j = 0; j < edgesJob.foundOne.Length; j++)
+            {
+                if (edgesJob.foundOne[j])
+                {
+                    edges.Remove(edge[j]);
+                }
+                else if (!edgesJob.foundOne[j])
+                {
+                    edges.Add(edge[j]);
+                }
+            }
+
+        }
+
+
 
 
         //oude manier doet paar uur over
