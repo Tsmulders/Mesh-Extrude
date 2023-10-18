@@ -9,19 +9,13 @@ using UnityEngine.UIElements;
 
 public class MeshExtrude : MonoBehaviour
 {
-
-    private Mesh mesh;
-    
+   
 
     private List<Mesh> listMech;
     private Vector3[] normals;
 
     //debug test 
-    public Vector3[] ar1;
-    public Vector3[] ar2;
-    public Vector3[] ar3;
     public int[] triangle;
-    public List<Edge> edges = new List<Edge>();
 
     public float threshold = 0.0001f;
     public float extrudeStrength = 0;
@@ -30,11 +24,32 @@ public class MeshExtrude : MonoBehaviour
     int countver1;
 
     // Start is called before the first frame update
-    void Awake()
+    private void Awake()
     {
+        ExtrudeStart();
+    }
 
+    void ExtrudeStart()
+    {
+        
+        if (transform.childCount > 0)
+        {
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                Extrude(transform.GetChild(i).gameObject);
+            }
+        }
+        if (GetComponent<MeshFilter>() != null)
+        {
+            Extrude(gameObject);
+        }
+    }
+
+    void Extrude(GameObject gOject)
+    {
+        Mesh mesh;
         listMech = new List<Mesh>();
-        mesh = GetComponent<MeshFilter>().mesh;
+        mesh = gOject.GetComponent<MeshFilter>().mesh;
 
 
 
@@ -42,9 +57,9 @@ public class MeshExtrude : MonoBehaviour
         threshold = furthestDistance / 500;
         extrudeStrength = furthestDistance / 50;
 
-        MechVerticesMerge2_0.AutoWeld(mesh, threshold);
+        MechVerticesMerge2_0.AutoWeld(mesh, threshold); // verplaat deze big aa code
 
-        mesh = GetComponent<MeshFilter>().mesh;
+        mesh = gOject.GetComponent<MeshFilter>().mesh;
 
         extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
         if (extrudevertex.Length == 0)
@@ -52,34 +67,22 @@ public class MeshExtrude : MonoBehaviour
             Debug.Log("there are no lose polygons");
             return;
         }
-
-        edges = GetEdgesOfMesh.GetEdge(mesh);
-
         for (int i = 0; i < extrudevertex.Length; i++)
         {
             Mesh mesh2;
             mesh2 = clonemesh(mesh, extrudevertex[i].indexEdges, extrudeStrength);
 
-            mesh = GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
+            mesh = gOject.GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
 
-            triangle = GetComponent<MeshFilter>().mesh.triangles;
-            ar3 = GetComponent<MeshFilter>().mesh.vertices;
+            triangle = gOject.GetComponent<MeshFilter>().mesh.triangles;
 
-            triangle = gameObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(extrudevertex[i].edgesCircle, extrudevertex[i].indexEdges).ToArray();
+            triangle = gOject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(extrudevertex[i].edgesCircle, extrudevertex[i].indexEdges, mesh).ToArray();
 
-            mesh = GetComponent<MeshFilter>().mesh;
+            mesh = gOject.GetComponent<MeshFilter>().mesh;
         }
-
-
         RecalculateMesh(mesh);
-        
     }
 
-    void Update()
-    {
-        //gameObject.GetComponent<MeshFilter>().mesh.triangles = triangle;
-        gameObject.GetComponent<MeshFilter>().mesh.vertices = ar3;
-    }
 
     void RecalculateMesh(Mesh meshRecalculate)
     {
@@ -133,9 +136,6 @@ public class MeshExtrude : MonoBehaviour
         clone.uv = uv.ToArray();
         clone.triangles = triangles.ToArray();
 
-        ar1 = original.vertices;
-        ar2 = clone.vertices;
-
         clone.RecalculateNormals();
 
         return clone;
@@ -155,7 +155,7 @@ public class MeshExtrude : MonoBehaviour
         return mesh;
     }
 
-    List<int> CennectMeshes(Edge[] edgePoints, int[] verticesIndex)
+    List<int> CennectMeshes(Edge[] edgePoints, int[] verticesIndex, Mesh mesh)
     {
         List<int> trianglesList = new List<int>();
         int[] oneTriangel = new int[3];
@@ -220,8 +220,6 @@ public class MeshExtrude : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (mesh)
-        {
             //for (int i = 0; i < edges.Count; i++)
             //{
 
@@ -245,6 +243,5 @@ public class MeshExtrude : MonoBehaviour
             //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[extrudevertex[i]]), 0.005f);
             //    }
             //}
-        }
     }
 }

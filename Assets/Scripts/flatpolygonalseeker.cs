@@ -5,21 +5,12 @@ using UnityEngine.Rendering;
 
 public class flatpolygonalseeker : MonoBehaviour
 {
-    Mesh mesh;
-    List<int> fadfa = new List<int>();
-    Vector3[] verts12345;
-    void Start()
-    {
-        mesh = GetComponent<MeshFilter>().mesh;
-        verts12345 = mesh.vertices;
-        LooseSurface(mesh);
-    }
-
-
-
     public static ExtrudeData[] LooseSurface(Mesh mesh)
     {
         List<ExtrudeData> extrude = new List<ExtrudeData>();
+
+        List<Edge> Alledges = new List<Edge>();
+        Alledges.AddRange(GetEdgesOfMesh.GetAllEdge(mesh));
 
         List<Edge> edges = new List<Edge>();
         
@@ -85,8 +76,7 @@ public class flatpolygonalseeker : MonoBehaviour
 
         Vector3[] verts = mesh.vertices;
         List<int> allvertsExtrude = new List<int>();
-        List<Edge> Alledges = new List<Edge>();
-        Alledges.AddRange(GetEdgesOfMesh.GetAllEdge(mesh));
+
 
         for (int i = 0; i < edgesCircle.Count; i++)
         {
@@ -124,19 +114,4 @@ public class flatpolygonalseeker : MonoBehaviour
 
         return extrude.ToArray();
     }
-
-
-
-    private void OnDrawGizmos()
-    {
-        if (mesh)
-        {
-            for (int i = 0; i < fadfa.Count; i++)
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[fadfa[i]]), 0.1f);
-            }
-        }
-    }
-
 }
