@@ -13,8 +13,7 @@ public class flatpolygonalseeker : MonoBehaviour
         Alledges.AddRange(GetEdgesOfMesh.GetAllEdge(mesh));
 
         List<Edge> edges = new List<Edge>();
-        
-        edges = GetEdgesOfMesh.GetEdge(mesh);
+        edges = GetEdgesOfMesh.GetEdge(mesh, Alledges);
         List<Edge> edgesCircle = new List<Edge>();
 
         if (edges == null || edges.Count == 0) return extrude.ToArray();
