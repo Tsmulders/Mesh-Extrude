@@ -1,14 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.FilePathAttribute;
 
 public class GetEdgesOfMesh : MonoBehaviour
 {
@@ -51,70 +54,125 @@ public class GetEdgesOfMesh : MonoBehaviour
 
 
         //test 1
-        int coreCount = SystemInfo.processorCount;
-
         Vector3[] points = mesh.vertices; // The mesh’s vertices
         int[] indicies = mesh.triangles; // The mesh’s triangle indicies
 
-        NativeArray<float3> vertices = new NativeArray<float3>(points.Length, Allocator.TempJob);
-        NativeArray<int> triangles = new NativeArray<int>(indicies.Length, Allocator.TempJob);
+        //NativeArray<Vector3> vertices = new NativeArray<Vector3>(points.Length, Allocator.TempJob);
+        NativeList<Vector3> positionA = new NativeList<Vector3>();
+        NativeList<Vector3> positionB = new NativeList<Vector3>();
+        NativeList<int> indexA = new NativeList<int>();
+        NativeList<int> indexB = new NativeList<int>();
 
         List<Edge> edges = new List<Edge>();
 
-        for (int i = 0; i < points.Length; i++)
-        {
-            vertices[i] = points[i];
-        }
+        //for (int i = 0; i < points.Length; i++)
+        //{
+        //    vertices[i] = points[i];
+        //}
 
-        for (int i = 0; i < indicies.Length; i++)
-        {
-            triangles[i] = indicies[i];
-        }
-
-
+        //for (int i = 0; i < indicies.Length; i++)
+        //{
+        //    triangles[i] = indicies[i];
+        //}
 
         
 
-
         for (int i = 0; i < indicies.Length - 1; i += 3)
         {
+            NativeList<Vector3> positionACheck = new NativeList<Vector3>(Allocator.TempJob);
+            NativeList<Vector3> positionBCheck = new NativeList<Vector3>(Allocator.TempJob);
+            NativeList<int> indexACheck = new NativeList<int>(3, Allocator.TempJob);
+            NativeList<int> indexBCheck = new NativeList<int>(3, Allocator.TempJob);
+
+            NativeArray<bool> foundOne = new NativeArray<bool>(3, Allocator.TempJob);
+            NativeArray<int> indexFound = new NativeArray<int>(3, Allocator.TempJob);
+
             Edge[] edge = new Edge[3];
 
-            edge[0] = new Edge(vertices[triangles[i]], vertices[triangles[i + 1]], triangles[i], triangles[i + 1]);
-            edge[1] = new Edge(vertices[triangles[i + 1]], vertices[triangles[i + 2]], triangles[i + 1], triangles[i + 2]);
-            edge[2] = new Edge(vertices[triangles[i + 2]], vertices[triangles[i]], triangles[i + 2], triangles[i]);
+            start:
 
+            edge[0] = new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]);
+            edge[1] = new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]);
+            edge[2] = new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]);
 
-            var edgesJob = new GetEdgeOuterJob()
+            if (positionA.Length < 0)
             {
-                
+                for (int j = 0; j < edge.Length; j++)
+                {
+                    edges.Add(edge[j]);
+                    positionA.Add(edge[j].A);
+                    positionB.Add(edge[j].B);
+                    indexA.Add(edge[j].indexA);
+                    indexB.Add(edge[j].indexB);
+                }
+                i += 3;
+                goto start;
+            }
+
+            for (int j = 0; j < edge.Length; j++)
+            {
+                positionACheck.Add(edge[j].A);
+                positionBCheck.Add(edge[j].B);
+                indexACheck.Add(edge[j].indexA);
+                indexBCheck.Add(edge[j].indexB);
+                foundOne[j] = false;
+                indexFound[j] = -1;
+            }
+
+            GetEdgeOuterJob edgesJob = new GetEdgeOuterJob()
+            {
+                positionA = positionA,
+                positionB = positionB,
+                indexA = indexA,
+                indexB = indexB,
+                foundOne = foundOne,
+                indexFound = indexFound,
+                positionACheck = positionACheck,
+                positionBCheck = positionBCheck,
+                indexACheck = indexACheck,
+                indexBCheck = indexBCheck,
             };
+            
 
-            edgesJob.Run(indicies.Length);
-
-            JobHandle sheduleJobDependency = new JobHandle();
-            JobHandle sheduleJobHandle = edgesJob.Schedule(indicies.Length, sheduleJobDependency);
-            JobHandle sheduleParralelJobHandle = edgesJob.ScheduleParallel(indicies.Length, 1, sheduleJobHandle);
+            JobHandle dependency = new JobHandle();
+            JobHandle sheduleJobHandle = edgesJob.Schedule(edge.Length, dependency);
+            JobHandle sheduleParralelJobHandle = edgesJob.ScheduleParallel(edge.Length, 1, sheduleJobHandle);
 
             sheduleParralelJobHandle.Complete();
 
-            vertices.Dispose();
-
-
+            
             for (int j = 0; j < edgesJob.foundOne.Length; j++)
             {
                 if (edgesJob.foundOne[j])
                 {
-                    edges.Remove(edge[j]);
+                    edges.RemoveAt(edgesJob.indexFound[j]);
+                    positionA.RemoveAt(edgesJob.indexFound[j]);
+                    positionB.RemoveAt(edgesJob.indexFound[j]);
+                    indexA.RemoveAt(edgesJob.indexFound[j]);
+                    indexB.RemoveAt(edgesJob.indexFound[j]);
                 }
                 else if (!edgesJob.foundOne[j])
                 {
                     edges.Add(edge[j]);
+                    positionA.Add(edgesJob.positionACheck[j]);
+                    positionB.Add(edgesJob.positionBCheck[j]);
+                    indexA.Add(edgesJob.indexACheck[j]);
+                    indexB.Add(edgesJob.indexBCheck[j]);
                 }
             }
 
+            positionACheck.Dispose();
+            positionBCheck.Dispose();
+            indexACheck.Dispose();
+            indexBCheck.Dispose();
+            foundOne.Dispose();
+            indexFound.Dispose();
         }
 
+        positionA.Dispose();
+        positionB.Dispose();
+        indexA.Dispose();
+        indexB.Dispose();
 
 
 
