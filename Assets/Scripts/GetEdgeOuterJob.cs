@@ -16,17 +16,21 @@ public struct GetEdgeOuterJob : IJobFor
     public NativeList<Vector3> positionA;
     [ReadOnly]
     public NativeList<Vector3> positionB;
-    [ReadOnly]
-    public NativeList<int> indexA;
-    [ReadOnly]
-    public NativeList<int> indexB;
+    //[ReadOnly]
+    //public NativeList<int> indexA;
+    //[ReadOnly]
+    //public NativeList<int> indexB;
 
     public NativeArray<bool> foundOne;
     public NativeArray<int> indexFound;
 
+    [ReadOnly]
     public NativeList<Vector3> positionACheck;
+    [ReadOnly]
     public NativeList<Vector3> positionBCheck;
+    [ReadOnly]
     public NativeList<int> indexACheck;
+    [ReadOnly] 
     public NativeList<int> indexBCheck;
     public void Execute(int i)
     {

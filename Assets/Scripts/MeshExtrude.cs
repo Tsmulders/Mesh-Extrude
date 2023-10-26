@@ -53,11 +53,11 @@ public class MeshExtrude : MonoBehaviour
 
 
 
-        float furthestDistance = furtherPoint(mesh);
-        threshold = furthestDistance / 500;
-        extrudeStrength = furthestDistance / 50;
+        //float furthestDistance = furtherPoint(mesh); // die duurt steet langer hoe meer vertices er zijn
+        //threshold = furthestDistance / 500;
+        //extrudeStrength = furthestDistance / 50;
 
-        MechVerticesMerge2_0.AutoWeld(mesh, threshold); // verplaat deze big aa code
+        MechVerticesMerge2_0.AutoWeld(mesh, threshold); // all vertices aan elkaar maken 
 
         mesh = gOject.GetComponent<MeshFilter>().mesh;
 

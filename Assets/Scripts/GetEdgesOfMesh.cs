@@ -58,10 +58,6 @@ public class GetEdgesOfMesh : MonoBehaviour
         int[] indicies = mesh.triangles; // The mesh’s triangle indicies
 
         //NativeArray<Vector3> vertices = new NativeArray<Vector3>(points.Length, Allocator.TempJob);
-        NativeList<Vector3> positionA = new NativeList<Vector3>();
-        NativeList<Vector3> positionB = new NativeList<Vector3>();
-        NativeList<int> indexA = new NativeList<int>();
-        NativeList<int> indexB = new NativeList<int>();
 
         List<Edge> edges = new List<Edge>();
 
@@ -79,6 +75,12 @@ public class GetEdgesOfMesh : MonoBehaviour
 
         for (int i = 0; i < indicies.Length - 1; i += 3)
         {
+
+            NativeList<Vector3> positionA = new NativeList<Vector3>(Allocator.TempJob);
+            NativeList<Vector3> positionB = new NativeList<Vector3>(Allocator.TempJob);
+            //NativeList<int> indexA = new NativeList<int>();
+            //NativeList<int> indexB = new NativeList<int>();
+
             NativeList<Vector3> positionACheck = new NativeList<Vector3>(Allocator.TempJob);
             NativeList<Vector3> positionBCheck = new NativeList<Vector3>(Allocator.TempJob);
             NativeList<int> indexACheck = new NativeList<int>(3, Allocator.TempJob);
@@ -95,6 +97,12 @@ public class GetEdgesOfMesh : MonoBehaviour
             edge[1] = new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]);
             edge[2] = new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]);
 
+            for (int j = 0; j < edges.Count; j++)
+            {
+                positionA.Add(edges[j].A);
+                positionB.Add(edges[j].B);
+            }
+
             if (positionA.Length < 0)
             {
                 for (int j = 0; j < edge.Length; j++)
@@ -102,8 +110,8 @@ public class GetEdgesOfMesh : MonoBehaviour
                     edges.Add(edge[j]);
                     positionA.Add(edge[j].A);
                     positionB.Add(edge[j].B);
-                    indexA.Add(edge[j].indexA);
-                    indexB.Add(edge[j].indexB);
+                    //indexA.Add(edge[j].indexA);
+                    //indexB.Add(edge[j].indexB);
                 }
                 i += 3;
                 goto start;
@@ -123,8 +131,8 @@ public class GetEdgesOfMesh : MonoBehaviour
             {
                 positionA = positionA,
                 positionB = positionB,
-                indexA = indexA,
-                indexB = indexB,
+                //indexA = indexA,
+                //indexB = indexB,
                 foundOne = foundOne,
                 indexFound = indexFound,
                 positionACheck = positionACheck,
@@ -140,24 +148,30 @@ public class GetEdgesOfMesh : MonoBehaviour
 
             sheduleParralelJobHandle.Complete();
 
-            
+            List<int> removeindex = new List<int>();
+
             for (int j = 0; j < edgesJob.foundOne.Length; j++)
             {
                 if (edgesJob.foundOne[j])
                 {
-                    edges.RemoveAt(edgesJob.indexFound[j]);
-                    positionA.RemoveAt(edgesJob.indexFound[j]);
-                    positionB.RemoveAt(edgesJob.indexFound[j]);
-                    indexA.RemoveAt(edgesJob.indexFound[j]);
-                    indexB.RemoveAt(edgesJob.indexFound[j]);
+
+                    //edges.RemoveAt(edgesJob.indexFound[j]);
+                    if (!removeindex.Contains(edgesJob.indexFound[j]))
+                    {
+                        removeindex.Add(edgesJob.indexFound[j]);
+                    }
+                    //positionA.RemoveAt(edgesJob.indexFound[j]);
+                    //positionB.RemoveAt(edgesJob.indexFound[j]);
+                    //indexA.RemoveAt(edgesJob.indexFound[j]);
+                    //indexB.RemoveAt(edgesJob.indexFound[j]);
                 }
                 else if (!edgesJob.foundOne[j])
                 {
                     edges.Add(edge[j]);
-                    positionA.Add(edgesJob.positionACheck[j]);
-                    positionB.Add(edgesJob.positionBCheck[j]);
-                    indexA.Add(edgesJob.indexACheck[j]);
-                    indexB.Add(edgesJob.indexBCheck[j]);
+                    //positionA.Add(edgesJob.positionACheck[j]);
+                    //positionB.Add(edgesJob.positionBCheck[j]);
+                    //indexA.Add(edgesJob.indexACheck[j]);
+                    //indexB.Add(edgesJob.indexBCheck[j]);
                 }
             }
 
@@ -167,12 +181,20 @@ public class GetEdgesOfMesh : MonoBehaviour
             indexBCheck.Dispose();
             foundOne.Dispose();
             indexFound.Dispose();
+            positionA.Dispose();
+            positionB.Dispose();
+            //indexA.Dispose();
+            //indexB.Dispose();
+
+            removeindex.Sort();
+            removeindex.Reverse();
+
+            for (int j = 0; j < removeindex.Count; j++)
+            {
+                edges.RemoveAt(removeindex[j]);
+            }
         }
 
-        positionA.Dispose();
-        positionB.Dispose();
-        indexA.Dispose();
-        indexB.Dispose();
 
 
 

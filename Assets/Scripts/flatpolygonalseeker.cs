@@ -41,15 +41,11 @@ public class flatpolygonalseeker : MonoBehaviour
                     goto _l2;
                 }
             }
-            if (!notChosen.Contains(i))
+            if (!edgesCircle.Contains(edgesdone[i]))
             {
                 notChosen.Add(i);
             }
         }
-        //if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
-        //{
-        //    return null;
-        //}
 
         if (notChosen.Count == 0 && edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
         {
@@ -62,7 +58,7 @@ public class flatpolygonalseeker : MonoBehaviour
                 edgesdone.Remove(edgesCircle[i]);
             }
             edgesCircle.Clear();
-            edgesCircle.Add(edgesdone[notChosen[0]]);
+            edgesCircle.Add(edges[notChosen[0]]);
             notChosen.Clear();
             j = 0;
              goto _l2;

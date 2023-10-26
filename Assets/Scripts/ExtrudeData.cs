@@ -10,6 +10,6 @@ public class ExtrudeData
     public ExtrudeData(List<int> index, List<Edge> edges)
     {
         indexEdges = index.ToArray();
-        edgesCircle = edges.ToArray(); 
+        edgesCircle = edges.ToArray();
     }
 }
