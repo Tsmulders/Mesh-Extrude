@@ -51,17 +51,20 @@ public class flatpolygonalseeker : MonoBehaviour
         {
             return extrude.ToArray();
         }
-        if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
+        if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB) 
         {
             for (int i = 0; i < edgesCircle.Count; i++)
             {
                 edgesdone.Remove(edgesCircle[i]);
             }
+            if (edgesdone.Count > 0)
+            {
             edgesCircle.Clear();
-            edgesCircle.Add(edges[notChosen[0]]);
+            edgesCircle.Add(edgesdone[0]);
             notChosen.Clear();
             j = 0;
-             goto _l2;
+            goto _l2;
+            }
         }
 
         Debug.Log("lose edge");
@@ -99,12 +102,14 @@ public class flatpolygonalseeker : MonoBehaviour
             {
                 edgesdone.Remove(edgesCircle[i]);
             }
-            edgesCircle.Clear();
-            edgesCircle.Add(edges[notChosen[0]]);
-            notChosen.Clear();
-            indexEdges.Clear();
-            j = 0;
-            goto _l2;
+            if (edgesdone.Count > 0)
+            {
+                edgesCircle.Clear();
+                edgesCircle.Add(edgesdone[0]);
+                notChosen.Clear();
+                j = 0;
+                goto _l2;
+            }
         }
 
         return extrude.ToArray();

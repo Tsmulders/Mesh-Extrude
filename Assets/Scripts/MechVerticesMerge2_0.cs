@@ -10,9 +10,9 @@ public class MechVerticesMerge2_0 : MonoBehaviour
     //weld close vertices. that it wil be 1 index.
     public static void AutoWeld(Mesh mesh, float threshold)
     {
-        Vector3[] normals = mesh.normals;
-        List<int> tris = new List<int>();
-        tris.AddRange(mesh.triangles.ToList());
+        //Vector3[] normals = mesh.normals;
+        //List<int> tris = new List<int>();
+        //tris.AddRange(mesh.triangles.ToList());
 
         //List<Vector3> verts = new List<Vector3>();
         //verts = mesh.vertices.ToList();
@@ -76,6 +76,10 @@ public class MechVerticesMerge2_0 : MonoBehaviour
 
 
         //test 2
+
+        Vector3[] normals = mesh.normals;
+        List<int> tris = new List<int>();
+        tris.AddRange(mesh.triangles.ToList());
         List<Vector3> verts = new List<Vector3>();
         verts = mesh.vertices.ToList();
 
@@ -87,13 +91,10 @@ public class MechVerticesMerge2_0 : MonoBehaviour
 
             NativeList<Vector3> vertices = new NativeList<Vector3>(Allocator.TempJob);
             NativeList<int> newVertsNative = new NativeList<int>(Allocator.TempJob);
-            NativeList<int> v = new NativeList<int>(Allocator.TempJob);
-
-            //bool maken die op false gaat als die moet veranderd moet worden. 
 
             NativeArray<bool> foundVertices = new NativeArray<bool>(verts.Count, Allocator.TempJob);
 
-            //
+
 
             for (int j = 0; j < verts.Count; j++)
             {
@@ -102,7 +103,7 @@ public class MechVerticesMerge2_0 : MonoBehaviour
 
             for (int j = 0; j < newVerts.Count; j++)
             {
-                for (int k = 0; k < newVerts[k].Count; k++)
+                for (int k = 0; k < newVerts[j].Count; k++)
                 {
                     newVertsNative.Add(newVerts[j][k]);
                 }
@@ -114,33 +115,38 @@ public class MechVerticesMerge2_0 : MonoBehaviour
                 newVertsNative = newVertsNative,
                 threshold = threshold,
                 firstVertices = i,
-                addToList = true,
-                v = v,
+                //addToList = true,
+                foundVertices = foundVertices,
             };
 
 
             JobHandle dependency = new JobHandle();
             JobHandle sheduleJobHandle = verticesWeldingJob.Schedule(verts.Count, dependency);
-            JobHandle sheduleParralelJobHandle = verticesWeldingJob.ScheduleParallel(verts.Count, 1, sheduleJobHandle);
+            JobHandle scheduleParallelJobHandle = verticesWeldingJob.ScheduleParallel(verts.Count, 1, sheduleJobHandle);
 
-            sheduleParralelJobHandle.Complete();
+            scheduleParallelJobHandle.Complete();
 
-            if (verticesWeldingJob.v.Length > 0)
+            List<int> nv = new List<int>();
+
+            for (int j = 0; j < verts.Count; j++)
             {
-                verticesWeldingJob.v.Add(i);
-                verticesWeldingJob.v.Sort();
-                List<int> nv = new List<int>();
-                for (int k = 0; k < verticesWeldingJob.v.Length; k++)
+                if (verticesWeldingJob.foundVertices[j])
                 {
-                    nv.Add(verticesWeldingJob.v[k]);
+                    nv.Add(j);
                 }
-                newVerts.Add(nv);
             }
 
             vertices.Dispose();
             newVertsNative.Dispose();
-            v.Dispose();
             foundVertices.Dispose();
+
+            if (nv.Count > 0)
+            {
+                nv.Add(i);
+                nv.Sort();
+                newVerts.Add(nv);
+                Debug.Log("done");
+            }
 
         }
 
@@ -148,12 +154,19 @@ public class MechVerticesMerge2_0 : MonoBehaviour
 
 
         //old code
+        //List<Vector3> verts = new List<Vector3>();
+        //verts = mesh.vertices.ToList();
+        //List<int> tris = new List<int>();
+        //tris.AddRange(mesh.triangles.ToList());
+        //List<List<int>> newVerts = new List<List<int>>();
+        //List<int> dellVerts = new List<int>();
+        //Vector3[] normals = mesh.normals;
+        ////get close verticies
         //for (int i = 0; i < verts.Count; i++)
         //{
         //    // Has vertex already been added to newVerts list?
         //    bool addToList = true;
         //    List<int> v = new List<int>();
-
         //    for (int j = 0; j < verts.Count; j++)
         //    {
         //        float distance = Vector3.Distance(verts[i], verts[j]);
@@ -171,10 +184,11 @@ public class MechVerticesMerge2_0 : MonoBehaviour
         //                    addToList = false;
         //                }
         //            }
-        //            addToList:
+        //        addToList:
         //            if (addToList)
         //            {
-        //                if(!v.Contains(i) && i != j) v.Add(j);
+
+        //                if (!v.Contains(i) && i != j) v.Add(j);
         //            }
         //        }
         //    }
@@ -187,11 +201,9 @@ public class MechVerticesMerge2_0 : MonoBehaviour
         //}
 
 
-
         //Debug.Log("newVerts done");
         //return if 0 where found  
         if (newVerts.Count == 0) return;
-
         //reassign triangles 
         for (int i = 0; i < newVerts.Count; i++)
         {
@@ -206,9 +218,9 @@ public class MechVerticesMerge2_0 : MonoBehaviour
                 }
             }
         }
-        //Debug.Log("triangles done");
 
-        // set normals corect 
+
+        //Debug.Log("triangles done");
         for (int i = 0; i < newVerts.Count; i++)
         {
             int bigX = newVerts[i][0];
@@ -238,7 +250,7 @@ public class MechVerticesMerge2_0 : MonoBehaviour
                 }
             }
         }
-        
+
 
         //Vector3 normal = Vector3.Lerp(v1, V2, 0.5f).normalized;
 

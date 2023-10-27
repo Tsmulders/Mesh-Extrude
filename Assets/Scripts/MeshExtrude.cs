@@ -23,10 +23,12 @@ public class MeshExtrude : MonoBehaviour
     ExtrudeData[] extrudevertex;
     int countver1;
 
+    public Vector3[] ar3;
     // Start is called before the first frame update
     private void Awake()
     {
         ExtrudeStart();
+        ar3 = GetComponent<MeshFilter>().mesh.vertices;
     }
 
     void ExtrudeStart()
@@ -45,6 +47,11 @@ public class MeshExtrude : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        GetComponent<MeshFilter>().mesh.vertices = ar3;
+    }
+
     void Extrude(GameObject gOject)
     {
         Mesh mesh;
@@ -57,7 +64,7 @@ public class MeshExtrude : MonoBehaviour
         //threshold = furthestDistance / 500;
         //extrudeStrength = furthestDistance / 50;
 
-        MechVerticesMerge2_0.AutoWeld(mesh, threshold); // all vertices aan elkaar maken 
+        MechVerticesMerge2_0.AutoWeld(mesh, threshold); //all vertices aan elkaar maken 
 
         mesh = gOject.GetComponent<MeshFilter>().mesh;
 

@@ -1,13 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Xml.Linq;
 using Unity.Collections;
 using Unity.Jobs;
-using Unity.VisualScripting;
 using UnityEngine;
+using Unity.Burst;
 
+[BurstCompile]
 public struct VerticesWeldingJob : IJobFor
 {
     //public NativeList<Vector3> vertices;
@@ -60,47 +59,34 @@ public struct VerticesWeldingJob : IJobFor
     //}
 
     //test 2
-
+    [ReadOnly]
     public NativeList<Vector3> vertices;
-
+    [ReadOnly]
     public NativeList<int> newVertsNative;
-
+    [ReadOnly]
     public float threshold;
-
+    [ReadOnly]
     public int firstVertices;
-
-    public NativeList<int> v;
-
-    public bool addToList;
 
     public NativeArray<bool> foundVertices;
 
     public void Execute(int index)
     {
-        
+        bool addToList = true;
+
         float distance = Vector3.Distance(vertices[firstVertices], vertices[index]);
         if (distance <= threshold)
         {
-            if (newVertsNative.Length == 0)
-            {
-                addToList = true;
-                goto addToList;
-            }
-            for (int k = 0; k < newVertsNative.Length; k++)
+            if (newVertsNative.Length != 0)
             {
                 if (newVertsNative.Contains(index))
                 {
                     addToList = false;
                 }
             }
-        addToList:
-            if (addToList)
+            if (addToList && index != firstVertices)
             {
-                //if (!v.Contains(firstVertices) && firstVertices != index) v.Add(index);
-                if (foundVertices[index])
-                {
-                    foundVertices[index] = false;
-                }  
+                foundVertices[index] = true;
             }
         }
     }
