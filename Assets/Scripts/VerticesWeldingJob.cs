@@ -6,7 +6,7 @@ using Unity.Jobs;
 using UnityEngine;
 using Unity.Burst;
 
-[BurstCompile]
+[BurstCompile] 
 public struct VerticesWeldingJob : IJobFor
 {
     //public NativeList<Vector3> vertices;
@@ -92,7 +92,7 @@ public struct VerticesWeldingJob : IJobFor
     }
 }
 
-public struct ContainerA
-{
-    public NativeList<int> subContainers;
-}
+//public struct ContainerA
+//{
+//    public NativeList<int> subContainers;
+//}
