@@ -114,13 +114,13 @@ public class flatpolygonalseeker : MonoBehaviour
          * kan helaas niet Multithread van wegen de array te groot is om te zetten naar nativearray te zetten
          */
 
-        //NativeList<int> indexA = new NativeList<int>(Allocator.TempJob);
-        //NativeList<int> indexB = new NativeList<int>(Allocator.TempJob);
+        //NativeArray<int> indexA = new NativeArray<int>(Alledges.Count, Allocator.Persistent);
+        //NativeArray<int> indexB = new NativeArray<int>(Alledges.Count, Allocator.Persistent);
 
         //for (int i = 0; i < Alledges.Count; i++)
         //{
-        //    indexA.Add(edgesCircle[i].indexA);
-        //    indexB.Add(edgesCircle[i].indexB);
+        //    indexA[i] = edgesCircle[i].indexA;
+        //    indexB[i] = edgesCircle[i].indexB;
         //}
 
         //NativeList<int> indexextrude = new NativeList<int>(Allocator.TempJob);
@@ -143,7 +143,6 @@ public class flatpolygonalseeker : MonoBehaviour
 
         //extract all vertices from list
         List<int> indexEdges = new List<int>();
-
 
         for (int i = 0; i < edgesCircle.Count; i++)
         {
@@ -203,6 +202,4 @@ public class flatpolygonalseeker : MonoBehaviour
 
         return extrude.ToArray();
     }
-
-
 }

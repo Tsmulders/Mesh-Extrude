@@ -1,0 +1,66 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+RWTexture2D<float4> Original;
+
+float Map(float value, float from1, float to1, float from2, float to2)
+{
+    return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+}
+
+float GetLuman(float4 color)
+{
+    return (color.x + color.y + color.z);
+}
+
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    int2 size;
+    Original.GetDimensions(size.x, size.y);
+    
+    uint yFliped = Map(id.y, 0, size.y, size.y, 0);
+    
+    // If pixel is black
+    if (Original[id.xy].a < 0.100)
+    {
+        float4 color = float4(0.0, 0.0, 0.0, 0.0);
+        int colorCount = 0;
+        
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                int xCorrected = id.x + x;
+                int yCorrected = id.y + y;
+                
+                // Skip the pixel we want to color.
+                if ((xCorrected + yCorrected) != 0)
+                {
+                    // Is pixel we look at within borders.
+                    if (xCorrected > 0 && xCorrected < size.x && yCorrected > 0 && yCorrected < size.y)
+                    {
+                        // Is adjacent pixel not black
+                        if (Original[int2(xCorrected, yCorrected)].a > 0.100)
+                        {
+                            color += Original[int2(xCorrected, yCorrected)];
+                            colorCount++;
+                        }
+                    }
+                }
+            }
+        }
+        
+        Result[id.xy] = color / colorCount;
+    }
+        // Copy colored pixel.
+    else
+    {
+        Result[id.xy] = Original[id.xy];
+    }
+    
+    Original[id.xy] = Result[id.xy];
+}

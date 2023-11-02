@@ -1,0 +1,40 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+float4 color;
+
+RWBuffer<float3> wer;
+RWStructuredBuffer<int> buffer;
+
+struct mesh_data
+{
+    float3 vertex;
+};
+
+StructuredBuffer<mesh_data> _vertices;
+StructuredBuffer<int> _triagles;
+
+float _MeshWave, _Time;
+
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+     
+    Result[id.xy] = (id.x & id.y) * color;
+}
+
+
+[numthreads(1024, 1, 1)]
+void MeshWave(uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!    
+    float3 ver = _vertices[id.x].vertex;
+    ver.y = sin(_Time + ver.x);
+    
+    _vertices[id.x].vertex = ver;
+}
