@@ -249,6 +249,7 @@ MonoBehaviour:
   compute: {fileID: 7200000, guid: 44e574822ae65704e8dc31e09b65c37a, type: 3}
   coler: {r: 1, g: 0, b: 0, a: 0}
   result: {fileID: 0}
+  mesh: {fileID: 0}
 --- !u!4 &896409827
 Transform:
   m_ObjectHideFlags: 0
@@ -473,6 +474,7 @@ GameObject:
   - component: {fileID: 1844697135}
   - component: {fileID: 1844697134}
   - component: {fileID: 1844697133}
+  - component: {fileID: 1844697137}
   m_Layer: 0
   m_Name: Plane (1)
   m_TagString: Untagged
@@ -567,6 +569,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1844697137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844697132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a7a35bc0e13bd24ab241a02ed441824, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  compute: {fileID: 7200000, guid: 44e574822ae65704e8dc31e09b65c37a, type: 3}
+  coler: {r: 1, g: 0, b: 0, a: 1}
+  result: {fileID: 0}
+  mesh: {fileID: 0}
 --- !u!1 &2027106366
 GameObject:
   m_ObjectHideFlags: 0

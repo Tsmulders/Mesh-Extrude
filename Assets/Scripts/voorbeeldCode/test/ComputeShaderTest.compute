@@ -13,28 +13,29 @@ RWStructuredBuffer<int> buffer;
 struct mesh_data
 {
     float3 vertex;
+    //float4x4 met;
 };
 
 StructuredBuffer<mesh_data> _vertices;
 StructuredBuffer<int> _triagles;
 
-float _MeshWave, _Time;
+float _Time;
 
-[numthreads(8, 8, 1)]
-void CSMain(uint3 id : SV_DispatchThreadID)
-{
-    // TODO: insert actual code here!
+//[numthreads(8, 8, 1)]
+//void CSMain(uint3 id : SV_DispatchThreadID)
+//{
+//    // TODO: insert actual code here!
      
-    Result[id.xy] = (id.x & id.y) * color;
-}
+//    Result[id.xy] = (id.x & id.y) * color;
+//}
 
 
-[numthreads(1024, 1, 1)]
-void MeshWave(uint3 id : SV_DispatchThreadID)
+[numthreads(64, 1, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!    
     float3 ver = _vertices[id.x].vertex;
     ver.y = sin(_Time + ver.x);
-    
+        
     _vertices[id.x].vertex = ver;
 }
