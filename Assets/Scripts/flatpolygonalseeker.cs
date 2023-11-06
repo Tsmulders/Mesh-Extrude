@@ -138,7 +138,7 @@ public class flatpolygonalseeker : MonoBehaviour
 
         //indexA.Dispose();
         //indexB.Dispose();
-        //indexextrude.Dispose();
+        //indexextrude.Dispose(); 
 
 
         //extract all vertices from list

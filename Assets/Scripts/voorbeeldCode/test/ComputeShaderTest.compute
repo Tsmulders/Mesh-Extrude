@@ -3,12 +3,12 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-RWTexture2D<float4> Result;
+//RWTexture2D<float4> Result;
 
-float4 color;
+//float4 color;
 
-RWBuffer<float3> wer;
-RWStructuredBuffer<int> buffer;
+//RWBuffer<float3> wer;
+//RWStructuredBuffer<int> buffer;
 
 struct mesh_data
 {
@@ -16,10 +16,12 @@ struct mesh_data
     //float4x4 met;
 };
 
-StructuredBuffer<mesh_data> _vertices;
-StructuredBuffer<int> _triagles;
+RWStructuredBuffer<mesh_data> _vertices;
+//StructuredBuffer<int> _triagles;
 
 float _Time;
+
+bool _reverse;
 
 //[numthreads(8, 8, 1)]
 //void CSMain(uint3 id : SV_DispatchThreadID)
@@ -30,12 +32,28 @@ float _Time;
 //}
 
 
-[numthreads(64, 1, 1)]
+[numthreads(128, 1, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!    
-    float3 ver = _vertices[id.x].vertex;
-    ver.y = sin(_Time + ver.x);
+
+    if (_reverse)
+    {
+        float3 ver = _vertices[id.x].vertex;
+        ver.y = sin(_Time + ver.z);
+
+        _vertices[id.x].vertex = ver;
+    }
+    else
+    {
+        float3 ver = _vertices[id.x].vertex;
+        ver.y = sin(_Time + ver.x);
         
-    _vertices[id.x].vertex = ver;
+        _vertices[id.x].vertex = ver;
+
+    }
+    
+    float distance = distance(_vertices[id.x].vertex, _vertices[id.x].vertex);
+    
+    
 }

@@ -76,18 +76,18 @@ public class GetEdgesOfMesh : MonoBehaviour
         for (int i = 0; i < indicies.Length - 1; i += 3)
         {
 
-            NativeList<Vector3> positionA = new NativeList<Vector3>(Allocator.TempJob);
-            NativeList<Vector3> positionB = new NativeList<Vector3>(Allocator.TempJob);
+            NativeList<Vector3> positionA = new NativeList<Vector3>(Allocator.Persistent);
+            NativeList<Vector3> positionB = new NativeList<Vector3>(Allocator.Persistent);
             //NativeList<int> indexA = new NativeList<int>();
             //NativeList<int> indexB = new NativeList<int>();
 
-            NativeList<Vector3> positionACheck = new NativeList<Vector3>(Allocator.TempJob);
-            NativeList<Vector3> positionBCheck = new NativeList<Vector3>(Allocator.TempJob);
-            NativeList<int> indexACheck = new NativeList<int>(3, Allocator.TempJob);
-            NativeList<int> indexBCheck = new NativeList<int>(3, Allocator.TempJob);
+            NativeList<Vector3> positionACheck = new NativeList<Vector3>(Allocator.Persistent);
+            NativeList<Vector3> positionBCheck = new NativeList<Vector3>(Allocator.Persistent);
+            NativeList<int> indexACheck = new NativeList<int>(3, Allocator.Persistent);
+            NativeList<int> indexBCheck = new NativeList<int>(3, Allocator.Persistent);
 
-            NativeArray<bool> foundOne = new NativeArray<bool>(3, Allocator.TempJob);
-            NativeArray<int> indexFound = new NativeArray<int>(3, Allocator.TempJob);
+            NativeArray<bool> foundOne = new NativeArray<bool>(3, Allocator.Persistent);
+            NativeArray<int> indexFound = new NativeArray<int>(3, Allocator.Persistent);
 
             Edge[] edge = new Edge[3];
 

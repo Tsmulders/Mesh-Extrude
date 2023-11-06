@@ -1,0 +1,27 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+//struct ExtrudeData
+//{
+//    int indexvetices;
+//};
+
+
+RWStructuredBuffer<int> indexA;
+RWStructuredBuffer<int> indexB;
+
+RWStructuredBuffer<int> Result;
+
+
+
+
+
+[numthreads(1024, 1, 1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+
+    
+
+}
+

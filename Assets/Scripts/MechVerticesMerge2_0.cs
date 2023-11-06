@@ -221,6 +221,8 @@ public class MechVerticesMerge2_0 : MonoBehaviour
 
 
         //Debug.Log("triangles done");
+
+        //recalculate normals
         for (int i = 0; i < newVerts.Count; i++)
         {
             int bigX = newVerts[i][0];
