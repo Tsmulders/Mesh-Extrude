@@ -23,7 +23,7 @@ public class flatpolygonalseeker : MonoBehaviour
 
 
         /*
-         * eerst alle edge cirkel uit elkaar hallen.
+         * eerst alle edge cirkel uit elkaar halen.
          * 
          * daar na alle edge cirkel apart controleren welke fast zitten.
          * ook kijken naar sub mechen om de de vertices te controleeren te verminderen.

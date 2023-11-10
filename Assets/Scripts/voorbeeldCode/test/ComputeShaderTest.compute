@@ -18,10 +18,12 @@ struct mesh_data
 
 RWStructuredBuffer<mesh_data> _vertices;
 //StructuredBuffer<int> _triagles;
+RWStructuredBuffer<bool> fountone;
 
 float _Time;
 
 bool _reverse;
+
 
 //[numthreads(8, 8, 1)]
 //void CSMain(uint3 id : SV_DispatchThreadID)
@@ -47,13 +49,13 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     else
     {
         float3 ver = _vertices[id.x].vertex;
-        ver.y = sin(_Time + ver.x);
+        ver.y = sin(_Time + ver.x / 2);
         
         _vertices[id.x].vertex = ver;
-
     }
+   
     
-    float distance = distance(_vertices[id.x].vertex, _vertices[id.x].vertex);
     
-    
+
 }
+

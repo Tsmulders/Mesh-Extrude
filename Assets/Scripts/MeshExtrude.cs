@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -227,28 +228,33 @@ public class MeshExtrude : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-            //for (int i = 0; i < edges.Count; i++)
-            //{
+        //for (int i = 0; i < edges.Count; i++)
+        //{
 
-            //    if (edges[i].indexA == edges[i].indexB)
-            //    {
-            //        Gizmos.color = Color.yellow;
-            //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.05f);
-            //    }
-            //    else
-            //    {
+        //    if (edges[i].indexA == edges[i].indexB)
+        //    {
+        //        Gizmos.color = Color.yellow;
+        //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.05f);
+        //    }
+        //    else
+        //    {
 
-            //        Gizmos.color = Color.green;
-            //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.04f);
-            //    }
-            //}
-            //if (extrudevertex != null)
-            //{
-            //    for (int i = 0; i < extrudevertex.Length; i++)
-            //    {
-            //        Gizmos.color = Color.green;
-            //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[extrudevertex[i]]), 0.005f);
-            //    }
-            //}
+        //        Gizmos.color = Color.green;
+        //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[edges[i].indexB]), 0.04f);
+        //    }
+        //}
+        //if (extrudevertex != null)
+        //{
+        //    for (int i = 0; i < extrudevertex.Length; i++)
+        //    {
+        //        Gizmos.color = Color.green;
+        //        Gizmos.DrawWireSphere(transform.TransformPoint(mesh.vertices[extrudevertex[i]]), 0.005f);
+        //    }
+        //}
+
+        //if (SceneView.lastActiveSceneView.drawGizmos)
+        //{
+
+        //}
     }
 }

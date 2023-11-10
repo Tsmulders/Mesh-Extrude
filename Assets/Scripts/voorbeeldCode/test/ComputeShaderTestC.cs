@@ -15,8 +15,12 @@ public struct mesh_data
 public class ComputeShaderTestC : MonoBehaviour
 {
 
-
+    [Header("compute shader")]
     [SerializeField] private ComputeShader compute;
+    [SerializeField] ComputeBuffer _meshPropertiesBuffer;
+
+
+    [Header(" texture")]
     [SerializeField] private Color coler = Color.red;
 
     [SerializeField] private RenderTexture result;
@@ -25,14 +29,14 @@ public class ComputeShaderTestC : MonoBehaviour
 
     private int _kernel;
 
-    ComputeBuffer _meshPropertiesBuffer;
+    
 
     Vector3[] vertices;
 
     int _count;
 
     mesh_data[] _data;
-
+    [Header("wave")]
     [SerializeField] private bool reverse;
 
     // Start is called before the first frame update
@@ -49,6 +53,8 @@ public class ComputeShaderTestC : MonoBehaviour
         
 
         compute.SetBuffer(_kernel, "_vertices", _meshPropertiesBuffer);
+
+        
     }
 
     private void OnDisable()
@@ -86,7 +92,10 @@ public class ComputeShaderTestC : MonoBehaviour
         compute.SetBool("_reverse", reverse);
         compute.Dispatch(_kernel, xGroup, 1, 1);
 
+
         _meshPropertiesBuffer.GetData(_data);
+            
+
 
         for (int i = 0; i < _count; i++)
         {
