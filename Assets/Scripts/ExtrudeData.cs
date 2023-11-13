@@ -7,9 +7,9 @@ public class ExtrudeData
     public int[] indexEdges;
     public Edge[] edgesCircle;
 
-    public ExtrudeData(List<int> index, List<Edge> edges)
+    public ExtrudeData(List<int> index, Edge[] edges)
     {
         indexEdges = index.ToArray();
-        edgesCircle = edges.ToArray();
+        edgesCircle = edges;
     }
 }

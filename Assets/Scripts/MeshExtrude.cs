@@ -69,7 +69,10 @@ public class MeshExtrude : MonoBehaviour
 
         mesh = gOject.GetComponent<MeshFilter>().mesh;
 
-        extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
+        //extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
+
+        extrudevertex = GetExtrudeData.GetData(mesh).ToArray();
+
         if (extrudevertex.Length == 0)
         {
             Debug.Log("there are no lose polygons");

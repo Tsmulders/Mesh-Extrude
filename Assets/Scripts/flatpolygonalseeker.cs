@@ -179,7 +179,7 @@ public class flatpolygonalseeker : MonoBehaviour
         }
         indexEdges.Sort();
 
-        extrude.Add(new ExtrudeData(indexEdges, edgesCircle));
+        extrude.Add(new ExtrudeData(indexEdges, edgesCircle.ToArray()));
 
 
 

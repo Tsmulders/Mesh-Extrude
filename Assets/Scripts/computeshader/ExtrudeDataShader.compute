@@ -2,25 +2,24 @@
 #pragma kernel CSMain
 
 
-struct ExtrudeData
-{
-    //int indexvetices;
-    float3 vertex;
-};
+//struct ExtrudeData
+//{
+//    //int indexvetices;
+//    float3 vertex;
+//};
 
-RWStructuredBuffer<ExtrudeData> _vertices;
+//RWStructuredBuffer<ExtrudeData> _vertices;
 
 RWStructuredBuffer<int> indexA;
 RWStructuredBuffer<int> indexB;
+RWStructuredBuffer<int> indexCheck;
 
 AppendStructuredBuffer<int> Result;
 
-RWStructuredBuffer<bool> Resultbool;
+RWStructuredBuffer<bool> boolInsiteArray;
 
-RWStructuredBuffer<int> count;
+//RWStructuredBuffer<int> count;
 
-//compute.Dispatch(_kernel, xGroup, yGroup, 1);
-//compute.SetInts
 
 [numthreads(32, 32, 1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
@@ -29,18 +28,18 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     uint width, height;
 
-    float distanceeee = distance(_vertices[id.x].vertex, _vertices[id.x].vertex);
+    //float distanceeee = distance(_vertices[id.x].vertex, _vertices[id.x].vertex);
     
-    if (indexA[id.x] == indexA[id.y] || indexB[id.x] == indexA[id.y] && !Resultbool[indexB[id.y]])
+    if (indexCheck[id.x] == indexA[id.y] || indexCheck[id.x] == indexA[id.y] && !boolInsiteArray[indexB[id.y]])
     {
         Result.Append(indexB[id.y]);
-        Resultbool[indexB[id.y]] = true;
+        boolInsiteArray[indexB[id.y]] = true;
         //count[0]++;
     }
-    if (indexA[id.x] == indexB[id.y] || indexB[id.x] == indexB[id.y] && !Resultbool[indexA[id.y]])
+    if (indexCheck[id.x] == indexB[id.y] || indexCheck[id.x] == indexB[id.y] && !boolInsiteArray[indexA[id.y]])
     {
         Result.Append(indexA[id.y]);
-        Resultbool[indexA[id.y]] = true;
+        boolInsiteArray[indexA[id.y]] = true;
         //count[0]++;
     }
 }
