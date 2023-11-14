@@ -182,8 +182,6 @@ public class flatpolygonalseeker : MonoBehaviour
         extrude.Add(new ExtrudeData(indexEdges, edgesCircle.ToArray()));
 
 
-
-
         if (notChosen.Count != 0)
         {
             for (int i = 0; i < edgesCircle.Count; i++)

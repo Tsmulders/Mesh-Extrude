@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 public class MeshExtrude : MonoBehaviour
 {
-   
+    [SerializeField] private ComputeShader compute;
 
     private List<Mesh> listMech;
     private Vector3[] normals;
@@ -61,9 +61,9 @@ public class MeshExtrude : MonoBehaviour
 
 
 
-        //float furthestDistance = furtherPoint(mesh); // die duurt steet langer hoe meer vertices er zijn
-        //threshold = furthestDistance / 500;
-        //extrudeStrength = furthestDistance / 50;
+        float furthestDistance = furtherPoint(mesh); // die duurt steet langer hoe meer vertices er zijn
+        threshold = furthestDistance / 500;
+        extrudeStrength = furthestDistance / 50;
 
         MechVerticesMerge2_0.AutoWeld(mesh, threshold); //all vertices aan elkaar maken 
 
@@ -71,7 +71,7 @@ public class MeshExtrude : MonoBehaviour
 
         //extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
 
-        extrudevertex = GetExtrudeData.GetData(mesh).ToArray();
+        extrudevertex = GetExtrudeData.GetData(mesh, compute).ToArray();
 
         if (extrudevertex.Length == 0)
         {

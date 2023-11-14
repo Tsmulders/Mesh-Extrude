@@ -86,7 +86,7 @@ public class ComputeShaderTestC : MonoBehaviour
         }
         _meshPropertiesBuffer.SetData(_data);
 
-        int xGroup = (int)(_count / 64.0f);
+        int xGroup = (int)(_count / 8.0f) +1;
 
         compute.SetFloat("_Time", Time.time);
         compute.SetBool("_reverse", reverse);
