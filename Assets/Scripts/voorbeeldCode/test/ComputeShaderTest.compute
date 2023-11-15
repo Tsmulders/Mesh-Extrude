@@ -1,5 +1,6 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
+#pragma kernel test2
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
@@ -34,7 +35,7 @@ bool _reverse;
 //}
 
 
-[numthreads(128, 1, 1)]
+[numthreads(8, 1, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!    
@@ -42,7 +43,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     if (_reverse)
     {
         float3 ver = _vertices[id.x].vertex;
-        ver.y = sin(_Time + ver.z);
+        ver.y = sin(_Time + ver.z - ver.x);
 
         _vertices[id.x].vertex = ver;
     }
@@ -53,9 +54,12 @@ void CSMain(uint3 id : SV_DispatchThreadID)
         
         _vertices[id.x].vertex = ver;
     }
-   
-    
-    
-
 }
 
+AppendStructuredBuffer<float3> result;
+
+[numthreads(8, 1, 1)]
+void test2(uint3 id : SV_DispatchThreadID)
+{
+    result.Append(float3(id.x, id.y, 1));
+}

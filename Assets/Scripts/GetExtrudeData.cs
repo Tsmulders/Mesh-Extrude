@@ -8,7 +8,7 @@ using UnityEngine;
 public class GetExtrudeData : MonoBehaviour
 {
 
-    public static ExtrudeData[] GetData(Mesh mesh, ComputeShader compute)
+    public static ExtrudeData[] GetData(Mesh mesh)
     {
         List<Edge> alledges = new List<Edge>();
         alledges.AddRange(GetEdgesOfMesh.GetAllEdge(mesh));
@@ -20,7 +20,7 @@ public class GetExtrudeData : MonoBehaviour
         List<Edge[]> CircleEdges = new List<Edge[]>();
         CircleEdges = GetEdgeCircle(edges);
 
-        return GetVertices(CircleEdges, alledges, compute);
+        return GetVertices(CircleEdges, alledges, mesh);
     }
 
 
@@ -95,8 +95,10 @@ public class GetExtrudeData : MonoBehaviour
     }
 
 
-    public static ExtrudeData[] GetVertices(List<Edge[]> CircleEdges , List<Edge> allEdges, ComputeShader compute)
+    public static ExtrudeData[] GetVertices(List<Edge[]> CircleEdges , List<Edge> allEdges, Mesh mesh)
     {
+        int verticesCount = mesh.vertices.Length;
+
         bool loop = true;
         int[] data;
 
@@ -113,13 +115,21 @@ public class GetExtrudeData : MonoBehaviour
         List<ExtrudeData> extrude = new List<ExtrudeData>();
         List<int> nextCheck = new List<int>();
 
-        //ComputeShader compute;
-        //compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/ExtrudeDataShader.compute");
+        ComputeShader compute;
+        compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/ExtrudeDataShader.compute");
         int _kernel = compute.FindKernel("CSMain");
         yGroup = (int)(allEdges.Count / 6.0f);
 
         
         ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
+        ComputeBuffer indexAuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
+        ComputeBuffer indexBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
+        ComputeBuffer InsiteArrayBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
+
+
+        compute.SetBuffer(_kernel, "indexA", indexAuffer);
+        compute.SetBuffer(_kernel, "indexB", indexBuffer);
+        compute.SetBuffer(_kernel, "InsiteArray", indexBuffer);
 
         for (int j = 0; j < allEdges.Count; j++)
         {
@@ -127,9 +137,12 @@ public class GetExtrudeData : MonoBehaviour
             indexB[j] = allEdges[j].indexB;
         }
 
-    _L1:
 
-        int[] InsiteArray = new int[allEdges.Count];
+        indexAuffer.SetData(indexA);
+        indexBuffer.SetData(indexB);
+
+    _L1:
+        int[] InsiteArray = new int[verticesCount];
         InsiteArray[0] = 0;
         for (int j = 0; j < CircleEdges[i].Length; j++)
         {
@@ -139,6 +152,7 @@ public class GetExtrudeData : MonoBehaviour
             InsiteArray[CircleEdges[i][j].indexB] = 1;
         }
         indexEdges.AddRange(nextCheck);
+        indexBuffer.SetData(InsiteArray);
 
         while (loop)
         {
@@ -147,25 +161,27 @@ public class GetExtrudeData : MonoBehaviour
             xGroup = (int)(nextCheck.Count / 20.0f);
 
             ComputeBuffer result;
-            result = new ComputeBuffer(allEdges.Count, sizeof(float) * 3, ComputeBufferType.Append);
+            result = new ComputeBuffer(allEdges.Count, sizeof(float), ComputeBufferType.Append);
             result.SetCounterValue(0);
+            ComputeBuffer indexCheck = new ComputeBuffer(nextCheck.Count * 10, sizeof(float), ComputeBufferType.Append);
 
             compute.SetBuffer(_kernel, "Result", result);
+            compute.SetBuffer(_kernel, "indexCheck", indexCheck);
 
-            compute.SetInts("indexA", indexA);
-            compute.SetInts("indexB", indexB);
-            compute.SetInts("indexCheck", nextCheck.ToArray());
-            compute.SetInts("InsiteArray", InsiteArray);
+
+            //compute.SetInts("indexA", indexA);
+            //compute.SetInts("indexB", indexB);
+            //compute.SetInts("indexCheck", nextCheck.ToArray());
+            //compute.SetInts("InsiteArray", InsiteArray);
+            indexCheck.SetData(nextCheck.ToArray());
             compute.Dispatch(_kernel, xGroup, yGroup, 1);
 
             ComputeBuffer.CopyCount(result, countBuffer, 0);
 
             int[] counter = new int[1] {0};
-            //countBuffer.GetData(counter);
+            countBuffer.GetData(counter);
 
-            
-
-            counter[0] = result.count;
+            //counter[0] = result.count;
 
             int count = counter[0];
 
@@ -184,7 +200,7 @@ public class GetExtrudeData : MonoBehaviour
             nextCheck.Clear();
             nextCheck.AddRange(data);
             result.Release();
-            
+            indexCheck.Release();
         }
         countBuffer.Release();
 
@@ -200,7 +216,12 @@ public class GetExtrudeData : MonoBehaviour
             indexEdges.Clear();
             goto _L1;
         }
-        
+
+        indexAuffer?.Release();
+        indexAuffer = null;
+        indexBuffer?.Release();
+        indexBuffer = null;
+
         return extrude.ToArray();
     }
 }

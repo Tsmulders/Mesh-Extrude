@@ -14,7 +14,6 @@ RWStructuredBuffer<int> InsiteArray;
 [numthreads(20, 6, 1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-      
     if (indexCheck[id.x] == indexA[id.y] && InsiteArray[indexB[id.y]] == 0)
     {
         Result.Append(indexB[id.y]);
