@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 using Unity.Mathematics;
 using UnityEngine;
@@ -76,7 +77,7 @@ public class ComputeShaderTestC : MonoBehaviour
     //Update is called once per frame
     void Update()
     {
-        //test1();
+        //  test1();
     }
 
     //verandere van color texture
@@ -115,8 +116,6 @@ public class ComputeShaderTestC : MonoBehaviour
 
         _meshPropertiesBuffer.GetData(_data);
 
-
-
         for (int i = 0; i < _count; i++)
         {
             vertices[i] = _data[i].vertex;
@@ -135,21 +134,31 @@ public class ComputeShaderTestC : MonoBehaviour
         int threads = 1;
         //doing another * 2 to make sure i have a large enough array.
         int testResults = threads * 8 * 8 * 8 * 2;
-        ComputeBuffer results = new ComputeBuffer(testResults, sizeof(float) * 3, ComputeBufferType.Append);
+        ComputeBuffer results = new ComputeBuffer(100, sizeof(float), ComputeBufferType.Append);
+        ComputeBuffer results2 = new ComputeBuffer(10, sizeof(int));
 
         compute.SetBuffer(_kerneltest2, "result", results);
+        compute.SetBuffer(_kerneltest2, "result2", results2);
 
-        compute.Dispatch(_kerneltest2, threads, threads, threads);
+        compute.Dispatch(_kerneltest2, 1, threads, threads);
 
-        Vector3[] test = new Vector3[testResults];
+        int[] test = new int[100];
         results.GetData(test);
         results.Release();
+        int[] test2 = new int[10];
+        results2.GetData(test2);
+        results2.Release();
 
+        test = test.Distinct().ToArray();
         Debug.Log("Test results amount : " + test.Length);
 
         for (int i = 0; i < test.Length; i++)
         {
+            if (test[i] == 123)
+            {
             Debug.Log("Test result at " + i + " : " + test[i]);
+
+            }
         }
     }
 }

@@ -118,7 +118,7 @@ public class GetExtrudeData : MonoBehaviour
         ComputeShader compute;
         compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/ExtrudeDataShader.compute");
         int _kernel = compute.FindKernel("CSMain");
-        yGroup = (int)(allEdges.Count / 6.0f);
+        yGroup = (int)(allEdges.Count / 1.0f);
 
         
         ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
@@ -158,12 +158,12 @@ public class GetExtrudeData : MonoBehaviour
         {
             //compute shader
 
-            xGroup = (int)(nextCheck.Count / 20.0f);
+            xGroup = (int)(nextCheck.Count / 1.0f);
 
             ComputeBuffer result;
             result = new ComputeBuffer(allEdges.Count, sizeof(float), ComputeBufferType.Append);
             result.SetCounterValue(0);
-            ComputeBuffer indexCheck = new ComputeBuffer(nextCheck.Count * 10, sizeof(float), ComputeBufferType.Append);
+            ComputeBuffer indexCheck = new ComputeBuffer(nextCheck.Count * 20, sizeof(float), ComputeBufferType.Append);
 
             compute.SetBuffer(_kernel, "Result", result);
             compute.SetBuffer(_kernel, "indexCheck", indexCheck);
@@ -191,7 +191,7 @@ public class GetExtrudeData : MonoBehaviour
 
             indexEdges.AddRange(data);
 
-            xGroup = (int)(data.Length / 8.0f);
+            xGroup = (int)(data.Length / 1.0f);
 
             if(data.Length != 0)
             {

@@ -11,6 +11,16 @@
 //RWBuffer<float3> wer;
 //RWStructuredBuffer<int> buffer;
 
+
+
+//[numthreads(8, 8, 1)]
+//void CSMain(uint3 id : SV_DispatchThreadID)
+//{
+//    // TODO: insert actual code here!
+     
+//    Result[id.xy] = (id.x & id.y) * color;
+//}
+
 struct mesh_data
 {
     float3 vertex;
@@ -24,16 +34,6 @@ RWStructuredBuffer<bool> fountone;
 float _Time;
 
 bool _reverse;
-
-
-//[numthreads(8, 8, 1)]
-//void CSMain(uint3 id : SV_DispatchThreadID)
-//{
-//    // TODO: insert actual code here!
-     
-//    Result[id.xy] = (id.x & id.y) * color;
-//}
-
 
 [numthreads(8, 1, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
@@ -56,10 +56,12 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     }
 }
 
-AppendStructuredBuffer<float3> result;
+AppendStructuredBuffer<int> result;
+RWStructuredBuffer<int> result2;
 
-[numthreads(8, 1, 1)]
+[numthreads(10, 1, 1)]
 void test2(uint3 id : SV_DispatchThreadID)
 {
-    result.Append(float3(id.x, id.y, 1));
+    result.Append(123);
+    result2[id.x] = 456;
 }
