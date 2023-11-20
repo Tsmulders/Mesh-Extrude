@@ -71,6 +71,7 @@ public class MeshExtrude : MonoBehaviour
 
         extrudevertex = GetExtrudeData.GetData(mesh).ToArray();
 
+
         if (extrudevertex.Length == 0)
         {
             Debug.Log("there are no lose polygons");

@@ -59,9 +59,16 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 AppendStructuredBuffer<int> result;
 RWStructuredBuffer<int> result2;
 
-[numthreads(10, 1, 1)]
+[numthreads(1, 1, 1)]
 void test2(uint3 id : SV_DispatchThreadID)
 {
-    result.Append(123);
-    result2[id.x] = 456;
+    if (id.x > 4)
+    {
+        result.Append(852);
+    }
+    if (id.x < 5)
+    {
+        result.Append(123);
+    }
+    result2[id.x] = 963;
 }

@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 using Unity.Mathematics;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -17,7 +19,8 @@ public class ComputeShaderTestC : MonoBehaviour
 {
 
     [Header("compute shader")]
-    [SerializeField] private ComputeShader compute;
+
+    ComputeShader compute;
     [SerializeField] ComputeBuffer _meshPropertiesBuffer;
 
 
@@ -43,7 +46,12 @@ public class ComputeShaderTestC : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        test2();
+
+        compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/voorbeeldCode/test/ComputeShaderTest.compute");
+        for (int i = 0; i < 3; i++)
+        {
+            test2();
+        }
 
         //_kernel = compute.FindKernel("CSMain");
         //UpdateBuffers();
@@ -129,26 +137,41 @@ public class ComputeShaderTestC : MonoBehaviour
 
     void test2()
     {
+
+
         int _kerneltest2 = compute.FindKernel("test2");
 
         int threads = 1;
         //doing another * 2 to make sure i have a large enough array.
         int testResults = threads * 8 * 8 * 8 * 2;
-        ComputeBuffer results = new ComputeBuffer(100, sizeof(float), ComputeBufferType.Append);
-        ComputeBuffer results2 = new ComputeBuffer(10, sizeof(int));
+        ComputeBuffer results = new ComputeBuffer(1000, sizeof(float), ComputeBufferType.Append);
+        ComputeBuffer results2 = new ComputeBuffer(100, sizeof(int));
+        results.SetCounterValue(0);
 
         compute.SetBuffer(_kerneltest2, "result", results);
         compute.SetBuffer(_kerneltest2, "result2", results2);
 
-        compute.Dispatch(_kerneltest2, 1, threads, threads);
+        compute.Dispatch(_kerneltest2, 10, 10, threads);
+        ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
 
-        int[] test = new int[100];
+        ComputeBuffer.CopyCount(results, countBuffer, 0);
+        int[] counter = new int[1] { 0 };
+        countBuffer.GetData(counter);
+        int count = counter[0];
+
+        int[] test = new int[count];
         results.GetData(test);
         results.Release();
-        int[] test2 = new int[10];
+        //results = null;
+        int[] test2 = new int[100];
         results2.GetData(test2);
         results2.Release();
 
+        //GC.Collect();
+        
+        List<int> result = new List<int>();
+        result.AddRange(test);
+        result.Sort();
         test = test.Distinct().ToArray();
         Debug.Log("Test results amount : " + test.Length);
 
@@ -157,7 +180,6 @@ public class ComputeShaderTestC : MonoBehaviour
             if (test[i] == 123)
             {
             Debug.Log("Test result at " + i + " : " + test[i]);
-
             }
         }
     }
