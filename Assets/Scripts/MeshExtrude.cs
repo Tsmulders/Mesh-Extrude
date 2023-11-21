@@ -56,10 +56,11 @@ public class MeshExtrude : MonoBehaviour
         Mesh mesh;
         listMech = new List<Mesh>();
         mesh = gOject.GetComponent<MeshFilter>().mesh;
+        MeshRenderer renderer = gOject.GetComponent<MeshRenderer>();
+        Vector3 size = renderer.bounds.size;
+        float furthestDistance = size.x;
 
-
-
-        float furthestDistance = furtherPoint(mesh); // die duurt steet langer hoe meer vertices er zijn
+        //float furthestDistance = furtherPoint(mesh); // die duurt steet langer hoe meer vertices er zijn
         threshold = furthestDistance / 500;
         extrudeStrength = furthestDistance / 50;
 

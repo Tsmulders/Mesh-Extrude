@@ -16,9 +16,17 @@ public class GetExtrudeData : MonoBehaviour
         List<Edge> edges = new List<Edge>();
         edges = GetEdgesOfMesh.GetEdge(mesh, alledges);
 
-        if (edges == null || edges.Count == 0) return null;
+        if (edges == null || edges.Count == 0) return new ExtrudeData[0];
         List<Edge[]> CircleEdges = new List<Edge[]>();
         CircleEdges = GetEdgeCircle(edges);
+        for (int i = 0; i < CircleEdges.Count; i++)
+        {
+            if (CircleEdges[i].Length == 2)
+            {
+                CircleEdges.RemoveAt(i);
+            }
+        }
+
 
         return GetVertices(CircleEdges, alledges, mesh);
     }
@@ -155,7 +163,7 @@ public class GetExtrudeData : MonoBehaviour
 
         while (loop)
         {
-            xGroup = (int)(nextCheck.Count);
+            xGroup = (int)(nextCheck.Count / 5);
 
             ComputeBuffer result;
             result = new ComputeBuffer(allEdges.Count * 50, sizeof(float), ComputeBufferType.Append);
@@ -181,14 +189,12 @@ public class GetExtrudeData : MonoBehaviour
 
             indexEdges.AddRange(data.Distinct().ToList());
 
-            xGroup = (int)(data.Length / 1.0f);
-
             if(data.Length == 0)
             {
                 loop = false;
             }
             nextCheck.Clear();
-            nextCheck.AddRange(data);
+            nextCheck.AddRange(data.Distinct().ToList());
             result.Release();
             indexCheck.Release();
         }
