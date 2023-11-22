@@ -4,13 +4,27 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 
+struct data
+{
+    int firstVertices;
+    RWStructuredBuffer<int> vertices;
+};
 
-RWStructuredBuffer<float3> vertices;
+RWStructuredBuffer<float3> _vertices;
+
+float threshold;
+int firstVertices;
 
 AppendStructuredBuffer<int> Result;
 
-[numthreads(8,1,1)]
+[numthreads(32,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-
+    
+    float _distance = distance(_vertices[firstVertices], _vertices[id.x]);
+    
+    if (_distance <= threshold && firstVertices != id.x)
+    {
+        Result.Append(id.x);
+    }
 }

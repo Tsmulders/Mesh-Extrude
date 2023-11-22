@@ -10,8 +10,8 @@ AppendStructuredBuffer<int> Result;
 RWStructuredBuffer<int> InsiteArray;
 
 //RWStructuredBuffer<int> count;
-
-[numthreads(5, 12, 1)]
+//of naar 12 zetten
+[numthreads(5, 24, 1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     if (indexCheck[id.x] == indexA[id.y] && InsiteArray[indexB[id.y]] == 0)

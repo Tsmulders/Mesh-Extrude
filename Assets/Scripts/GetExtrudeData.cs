@@ -26,13 +26,11 @@ public class GetExtrudeData : MonoBehaviour
                 CircleEdges.RemoveAt(i);
             }
         }
-
-
         return GetVertices(CircleEdges, alledges, mesh);
     }
 
 
-    public static List<Edge[]> GetEdgeCircle(List<Edge> edges)
+    private static List<Edge[]> GetEdgeCircle(List<Edge> edges)
     {
         List<Edge[]> circleEdges = new List<Edge[]>();
 
@@ -103,7 +101,7 @@ public class GetExtrudeData : MonoBehaviour
     }
 
 
-    public static ExtrudeData[] GetVertices(List<Edge[]> CircleEdges , List<Edge> allEdges, Mesh mesh)
+    private static ExtrudeData[] GetVertices(List<Edge[]> CircleEdges , List<Edge> allEdges, Mesh mesh)
     {
         int verticesCount = mesh.vertices.Length;
 
@@ -125,7 +123,7 @@ public class GetExtrudeData : MonoBehaviour
         ComputeShader compute;
         compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/ExtrudeDataShader.compute");
         int _kernel = compute.FindKernel("CSMain");
-        yGroup = (int)(allEdges.Count / 6.0f);
+        yGroup = (int)(allEdges.Count / 24.0f);
 
         
         ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);

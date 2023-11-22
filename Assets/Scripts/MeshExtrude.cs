@@ -51,12 +51,12 @@ public class MeshExtrude : MonoBehaviour
         GetComponent<MeshFilter>().mesh.vertices = ar3;
     }
 
-    void Extrude(GameObject gOject)
+    void Extrude(GameObject gObject)
     {
         Mesh mesh;
         listMech = new List<Mesh>();
-        mesh = gOject.GetComponent<MeshFilter>().mesh;
-        MeshRenderer renderer = gOject.GetComponent<MeshRenderer>();
+        mesh = gObject.GetComponent<MeshFilter>().mesh;
+        MeshRenderer renderer = gObject.GetComponent<MeshRenderer>();
         Vector3 size = renderer.bounds.size;
         float furthestDistance = size.x;
 
@@ -64,10 +64,10 @@ public class MeshExtrude : MonoBehaviour
         threshold = furthestDistance / 500;
         extrudeStrength = furthestDistance / 50;
 
-        MechVerticesMerge2_0.AutoWeld(mesh, threshold); //all vertices aan elkaar maken 
-
-        mesh = gOject.GetComponent<MeshFilter>().mesh;
-
+        MechVerticesMerge2_0.AutoWeld(mesh, threshold); //all vertices aan elkaar maken
+        //mesh =  MechVerticesMerge3_0.AutoWeld(mesh, threshold);
+        mesh = gObject.GetComponent<MeshFilter>().mesh;
+        
         //extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
 
         extrudevertex = GetExtrudeData.GetData(mesh).ToArray();
@@ -83,13 +83,13 @@ public class MeshExtrude : MonoBehaviour
             Mesh mesh2;
             mesh2 = clonemesh(mesh, extrudevertex[i].indexEdges, extrudeStrength);
 
-            mesh = gOject.GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
+            mesh = gObject.GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
 
-            triangle = gOject.GetComponent<MeshFilter>().mesh.triangles;
+            triangle = gObject.GetComponent<MeshFilter>().mesh.triangles;
 
-            triangle = gOject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(extrudevertex[i].edgesCircle, extrudevertex[i].indexEdges, mesh).ToArray();
+            triangle = gObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(extrudevertex[i].edgesCircle, extrudevertex[i].indexEdges, mesh).ToArray();
 
-            mesh = gOject.GetComponent<MeshFilter>().mesh;
+            mesh = gObject.GetComponent<MeshFilter>().mesh;
         }
         RecalculateMesh(mesh);
     }
