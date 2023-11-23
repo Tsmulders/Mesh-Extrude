@@ -204,6 +204,7 @@ public class MechVerticesMerge2_0 : MonoBehaviour
         //Debug.Log("newVerts done");
         //return if 0 where found  
         if (newVerts.Count == 0) return;
+        Debug.Log(newVerts.Count);
         //reassign triangles 
         for (int i = 0; i < newVerts.Count; i++)
         {

@@ -13,8 +13,9 @@ public class MechVerticesMerge3_0 : MonoBehaviour
         List<int> tris = mesh.triangles.ToList();
         Vector3[] normals = mesh.normals;
         List<List<int>> newVerts = CloseVertices(mesh, threshold);
+        if (newVerts.Count == 0) return mesh;
+        Debug.Log(newVerts.Count);
         tris = ReassignTriangles(newVerts, tris);
-
         normals = RecalculateNormals(newVerts, normals);
 
         mesh.triangles = tris.ToArray();
@@ -44,38 +45,48 @@ public class MechVerticesMerge3_0 : MonoBehaviour
 
         for (int i = 0; i < _vertices.Length; i++)
         {
+            //bool skip = false;
+            //for (int j = 0; j < newVerts.Count; j++)
+            //{
+            //    if (newVerts[j].Contains(i))
+            //    {
+            //        skip = true;
+            //    }
+            //}
 
+            //if (!skip)
+            //{
+                ComputeBuffer result = new ComputeBuffer(mesh.vertices.Length, sizeof(int), ComputeBufferType.Append);
+                result.SetCounterValue(0);
 
-            ComputeBuffer result = new ComputeBuffer(mesh.vertices.Length, sizeof(int), ComputeBufferType.Append);
-            result.SetCounterValue(0);
+                compute.SetBuffer(_kernel, "Result", result);
 
-            compute.SetBuffer(_kernel, "Result", result);
+                compute.SetInt("firstVertices", i);
+                compute.Dispatch(_kernel, _vertices.Length/ 16, 1, 1);
 
-            compute.SetInt("firstVertices", i);
-            compute.Dispatch(_kernel, _vertices.Length/ 32, 1, 1);
+                ComputeBuffer.CopyCount(result, countBuffer, 0);
 
-            ComputeBuffer.CopyCount(result, countBuffer, 0);
+                int[] counter = new int[1] { 0 };
+                countBuffer.GetData(counter);
 
-            int[] counter = new int[1] { 0 };
-            countBuffer.GetData(counter);
+                int count = counter[0];
 
-            int count = counter[0];
+                int[] data = new int[count];
 
-            int[] data = new int[count];
+                result.GetData(data);
 
-            result.GetData(data);
-
-            if (data.Length > 0)
-            {
-                List<int> indices = new List<int>();
-                indices.AddRange(data);
-                indices.Add(i);
-                indices.Sort();
-                newVerts.Add(indices);
-                Debug.Log("done");
+                if (data.Length > 0)
+                {
+                    List<int> indices = new List<int>();
+                    indices.AddRange(data);
+                    indices.Add(i);
+                    indices.Sort();
+                    newVerts.Add(indices.Distinct().ToList());
+                    Debug.Log("done");
+                }
+                result.Release();
             }
-            result.Release();
-        }
+        //}
         countBuffer.Release();
         _verticesBuffer.Release();
         return newVerts;
@@ -97,6 +108,9 @@ public class MechVerticesMerge3_0 : MonoBehaviour
             }
         }
         return tris;
+
+
+
     }
 
     private static Vector3[] RecalculateNormals(List<List<int>> newVerts, Vector3[] normals)

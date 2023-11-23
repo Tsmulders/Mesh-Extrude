@@ -179,10 +179,10 @@ public class GetEdgesOfMesh : MonoBehaviour
             positionBCheck.Dispose();
             indexACheck.Dispose();
             indexBCheck.Dispose();
-            foundOne.Dispose();
-            indexFound.Dispose();
             positionA.Dispose();
             positionB.Dispose();
+            foundOne.Dispose();
+            indexFound.Dispose();
             //indexA.Dispose();
             //indexB.Dispose();
 

@@ -1,6 +1,7 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
+
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 
@@ -17,7 +18,7 @@ int firstVertices;
 
 AppendStructuredBuffer<int> Result;
 
-[numthreads(32,1,1)]
+[numthreads(16,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     
@@ -28,3 +29,4 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         Result.Append(id.x);
     }
 }
+

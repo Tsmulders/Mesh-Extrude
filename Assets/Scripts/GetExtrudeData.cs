@@ -211,7 +211,7 @@ public class GetExtrudeData : MonoBehaviour
             goto _L1;
         }
         countBuffer.Release();
-
+        InsiteArrayBuffer.Release();
         indexABuffer?.Release();
         indexABuffer = null;
         indexBBuffer?.Release();
