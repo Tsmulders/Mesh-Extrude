@@ -8,7 +8,7 @@
 struct data
 {
     int firstVertices;
-    RWStructuredBuffer<int> vertices;
+    AppendStructuredBuffer<int> vertices;
 };
 
 RWStructuredBuffer<float3> _vertices;
@@ -29,4 +29,3 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         Result.Append(id.x);
     }
 }
-

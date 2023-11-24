@@ -12,10 +12,10 @@ public class GetExtrudeData : MonoBehaviour
     {
         List<Edge> alledges = new List<Edge>();
         alledges.AddRange(GetEdgesOfMesh.GetAllEdge(mesh));
-
+        //134700
         List<Edge> edges = new List<Edge>();
         edges = GetEdgesOfMesh.GetEdge(mesh, alledges);
-
+        //40
         if (edges == null || edges.Count == 0) return new ExtrudeData[0];
         List<Edge[]> CircleEdges = new List<Edge[]>();
         CircleEdges = GetEdgeCircle(edges);
@@ -28,6 +28,7 @@ public class GetExtrudeData : MonoBehaviour
         }
         return GetVertices(CircleEdges, alledges, mesh);
     }
+
 
 
     private static List<Edge[]> GetEdgeCircle(List<Edge> edges)
@@ -123,7 +124,8 @@ public class GetExtrudeData : MonoBehaviour
         ComputeShader compute;
         compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/ExtrudeDataShader.compute");
         int _kernel = compute.FindKernel("CSMain");
-        yGroup = (int)(allEdges.Count / 24.0f);
+        yGroup = Mathf.RoundToInt((allEdges.Count / 24.0f));
+        Debug.Log(yGroup);
 
         
         ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
@@ -161,8 +163,9 @@ public class GetExtrudeData : MonoBehaviour
 
         while (loop)
         {
-            xGroup = (int)(nextCheck.Count / 5);
-
+            xGroup = Mathf.RoundToInt((nextCheck.Count / 5));
+            Debug.Log(nextCheck.Count);
+            Debug.Log(xGroup);
             ComputeBuffer result;
             result = new ComputeBuffer(allEdges.Count * 50, sizeof(float), ComputeBufferType.Append);
             result.SetCounterValue(0);
@@ -172,8 +175,9 @@ public class GetExtrudeData : MonoBehaviour
             compute.SetBuffer(_kernel, "indexCheck", indexCheck);
 
             indexCheck.SetData(nextCheck.ToArray());
-            compute.Dispatch(_kernel, xGroup, yGroup, 1);
+            compute.SetInt("max", nextCheck.Count);
 
+            compute.Dispatch(_kernel, xGroup, yGroup, 1);
             ComputeBuffer.CopyCount(result, countBuffer, 0);
 
             int[] counter = new int[1] {0};

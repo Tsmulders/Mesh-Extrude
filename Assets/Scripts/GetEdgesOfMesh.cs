@@ -290,8 +290,16 @@ public class GetEdgesOfMesh : MonoBehaviour
                 edges.Add(edge2);
             }
         }
-
         return edges;
+    }
+
+
+
+    public static List<Edge> GetAllEdges(Mesh mesh)
+    {
+
+
+        return null;
     }
 }
 

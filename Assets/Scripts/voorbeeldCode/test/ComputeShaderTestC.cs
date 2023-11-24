@@ -31,7 +31,7 @@ public class ComputeShaderTestC : MonoBehaviour
 
     [SerializeField] private Mesh mesh;
 
-    private int _kernel;
+    private int _kernel = 0;
 
     
 

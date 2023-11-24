@@ -1,6 +1,7 @@
 using Microsoft.Win32.SafeHandles;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Burst.CompilerServices;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -87,14 +88,10 @@ public class MechVerticesMerge2_0 : MonoBehaviour
 
         for (int i = 0; i < verts.Count; i++)
         {
-
-
             NativeList<Vector3> vertices = new NativeList<Vector3>(Allocator.TempJob);
             NativeList<int> newVertsNative = new NativeList<int>(Allocator.TempJob);
 
             NativeArray<bool> foundVertices = new NativeArray<bool>(verts.Count, Allocator.TempJob);
-
-
 
             for (int j = 0; j < verts.Count; j++)
             {
@@ -147,7 +144,6 @@ public class MechVerticesMerge2_0 : MonoBehaviour
                 newVerts.Add(nv);
                 Debug.Log("done");
             }
-
         }
 
 

@@ -108,9 +108,6 @@ public class MechVerticesMerge3_0 : MonoBehaviour
             }
         }
         return tris;
-
-
-
     }
 
     private static Vector3[] RecalculateNormals(List<List<int>> newVerts, Vector3[] normals)

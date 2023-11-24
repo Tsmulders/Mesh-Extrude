@@ -9,22 +9,27 @@ AppendStructuredBuffer<int> Result;
 
 RWStructuredBuffer<int> InsiteArray;
 
+int max;
+
 //RWStructuredBuffer<int> count;
 //of naar 12 zetten
 [numthreads(5, 24, 1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    if (indexCheck[id.x] == indexA[id.y] && InsiteArray[indexB[id.y]] == 0)
+    if (id.x <= max)
     {
-        Result.Append(indexB[id.y]);
-        InsiteArray[indexB[id.y]] = 1;
-        //count[0]++;
-    }
-    if (indexCheck[id.x] == indexB[id.y] && InsiteArray[indexA[id.y]] == 0)
-    {
-        Result.Append(indexA[id.y]);
-        InsiteArray[indexA[id.y]] = 1;
-        //count[0]++;
+        if (indexCheck[id.x] == indexA[id.y] && InsiteArray[indexB[id.y]] == 0)
+        {
+            Result.Append(indexB[id.y]);
+            InsiteArray[indexB[id.y]] = 1;
+            //count[0]++;
+        }
+        if (indexCheck[id.x] == indexB[id.y] && InsiteArray[indexA[id.y]] == 0)
+        {
+            Result.Append(indexA[id.y]);
+            InsiteArray[indexA[id.y]] = 1;
+            //count[0]++;
+        }
     }
 }
 
