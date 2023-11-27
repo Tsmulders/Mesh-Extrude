@@ -9,6 +9,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static UnityEditor.FilePathAttribute;
@@ -273,33 +274,84 @@ public class GetEdgesOfMesh : MonoBehaviour
 
         for (int i = 0; i < indicies.Length - 1; i += 3)
         {
-            Edge edge = new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]);
-            Edge edge1 = new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]);
-            Edge edge2 = new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]);
+            edges.Add(new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]));
+            edges.Add(new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]));
+            edges.Add(new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]));
 
-            if (!edges.Contains(edge))
-            {
-                edges.Add(edge);
-            }
-            if (!edges.Contains(edge1))
-            {
-                edges.Add(edge1);
-            }
-            if (!edges.Contains(edge2))
-            {
-                edges.Add(edge2);
-            }
+            //Edge edge = new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]);
+            //Edge edge1 = new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]);
+            //Edge edge2 = new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]);
+
+            //if (!edges.Contains(edge))
+            //{
+            //    edges.Add(edge);
+            //}
+            //if (!edges.Contains(edge1))
+            //{
+            //    edges.Add(edge1);
+            //}
+            //if (!edges.Contains(edge2))
+            //{
+            //    edges.Add(edge2);
+            //}
         }
         return edges;
     }
 
-
+    public struct data
+    {
+        public float3 A;
+        public float3 B;
+        public int indexA;
+        public int indexB;
+    }
 
     public static List<Edge> GetAllEdges(Mesh mesh)
     {
+        ComputeShader compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/GetAllEdgesShader.compute");
+        int _kernel = compute.FindKernel("CSMain");
 
+        Vector3[] points = mesh.vertices; // The mesh’s vertices
+        int[] triangles = mesh.triangles; // The mesh’s triangle
 
-        return null;
+        List<Edge> edges = new List<Edge>();
+
+        int xGroup = Mathf.RoundToInt((triangles.Length /3 / 32));
+
+        ComputeBuffer vertices = new ComputeBuffer(points.Length, sizeof(float) * 3);
+        ComputeBuffer trianglesBuffer = new ComputeBuffer(triangles.Length, sizeof(int));
+        ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
+        ComputeBuffer result = new ComputeBuffer(triangles.Length * 2, sizeof(float) * 4, ComputeBufferType.Append);
+        result.SetCounterValue(0);
+
+        compute.SetBuffer(_kernel, "Result", result);
+        compute.SetBuffer(_kernel, "vertices", vertices);
+        compute.SetBuffer(_kernel, "triangles", trianglesBuffer);
+
+        vertices.SetData(points);
+        trianglesBuffer.SetData(triangles);
+
+        compute.Dispatch(_kernel, xGroup, 1, 1);
+        
+        ComputeBuffer.CopyCount(result, countBuffer, 0);
+
+        int[] counter = new int[1] { 0 };
+        countBuffer.GetData(counter);
+
+        int count = counter[0];
+
+        data[] data = new data[count];
+
+        result.GetData(data);
+
+        vertices.Release();
+        trianglesBuffer.Release();
+        countBuffer.Release();
+        result.Release();
+
+        edges.AddRange(data);
+
+        return edges;
     }
 }
 

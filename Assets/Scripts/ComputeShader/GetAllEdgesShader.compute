@@ -4,13 +4,47 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 
+struct data
+{
+    float3 A;
+    float3 B;
+    int indexA;
+    int indexB;
+};
 
+RWStructuredBuffer<int> triangles;
+RWStructuredBuffer<float3> vertices;
 
-AppendStructuredBuffer<int> Result;
+AppendStructuredBuffer<data> Result;
 
-[numthreads(8,1,1)]
+int index;
+
+[numthreads(32,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
+   
     // TODO: insert actual code here!
+    index = id.x * 3;
+    
+    data edge1;
+    edge1.A = vertices[index];
+    edge1.B = vertices[index + 1];
+    edge1.indexA = triangles[index];
+    edge1.indexB = triangles[index + 1];
 
+    data edge2;
+    edge2.A = vertices[index + 1];
+    edge2.B = vertices[index + 2];
+    edge2.indexA = triangles[index + 1];
+    edge2.indexB = triangles[index + 2];
+    
+    data edge3;
+    edge3.A = vertices[index + 2];
+    edge3.B = vertices[index];
+    edge3.indexA = triangles[index + 2];
+    edge3.indexB = triangles[index];
+    
+    Result.Append(edge1);
+    Result.Append(edge2);
+    Result.Append(edge3);
 }

@@ -13,6 +13,10 @@ public class GetExtrudeData : MonoBehaviour
         List<Edge> alledges = new List<Edge>();
         alledges.AddRange(GetEdgesOfMesh.GetAllEdge(mesh));
         //134700
+        if (alledges.Count == 0)
+        {
+            return new ExtrudeData[0];
+        }
         List<Edge> edges = new List<Edge>();
         edges = GetEdgesOfMesh.GetEdge(mesh, alledges);
         //40
@@ -124,7 +128,7 @@ public class GetExtrudeData : MonoBehaviour
         ComputeShader compute;
         compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/ExtrudeDataShader.compute");
         int _kernel = compute.FindKernel("CSMain");
-        yGroup = Mathf.RoundToInt((allEdges.Count / 24.0f));
+        yGroup = Mathf.RoundToInt((allEdges.Count / 32.0f));
         Debug.Log(yGroup);
 
         
@@ -134,8 +138,8 @@ public class GetExtrudeData : MonoBehaviour
         ComputeBuffer InsiteArrayBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
 
 
-        compute.SetBuffer(_kernel, "indexA", indexABuffer);
-        compute.SetBuffer(_kernel, "indexB", indexBBuffer);
+        compute.SetBuffer(_kernel, "AIndex", indexABuffer);
+        compute.SetBuffer(_kernel, "BIndex", indexBBuffer);
         compute.SetBuffer(_kernel, "InsiteArray", InsiteArrayBuffer);
 
         for (int j = 0; j < allEdges.Count; j++)
@@ -163,7 +167,7 @@ public class GetExtrudeData : MonoBehaviour
 
         while (loop)
         {
-            xGroup = Mathf.RoundToInt((nextCheck.Count / 5));
+            xGroup = Mathf.RoundToInt((nextCheck.Count / 1));
             Debug.Log(nextCheck.Count);
             Debug.Log(xGroup);
             ComputeBuffer result;

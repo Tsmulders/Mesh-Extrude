@@ -65,19 +65,19 @@ public class MeshExtrude : MonoBehaviour
         extrudeStrength = furthestDistance / 50;
             
         //MechVerticesMerge2_0.AutoWeld(mesh, threshold); //all vertices aan elkaar maken
-        //mesh =  MechVerticesMerge3_0.AutoWeld(mesh, threshold); 
+        mesh =  MechVerticesMerge3_0.AutoWeld(mesh, threshold);
         //mesh = gObject.GetComponent<MeshFilter>().mesh;
         
         //extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
 
         extrudevertex = GetExtrudeData.GetData(mesh).ToArray();
-        //[121] dit is de juiste uit komst
-        Debug.Log(extrudevertex[0].indexEdges.Length);
+        //[121]
         if (extrudevertex.Length == 0)
         {
             Debug.Log("there are no lose polygons");
             return;
         }
+        Debug.Log(extrudevertex[0].indexEdges.Length);
         for (int i = 0; i < extrudevertex.Length; i++)
         {
             Mesh mesh2;

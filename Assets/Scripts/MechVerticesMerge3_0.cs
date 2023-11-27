@@ -45,17 +45,18 @@ public class MechVerticesMerge3_0 : MonoBehaviour
 
         for (int i = 0; i < _vertices.Length; i++)
         {
-            //bool skip = false;
-            //for (int j = 0; j < newVerts.Count; j++)
-            //{
-            //    if (newVerts[j].Contains(i))
-            //    {
-            //        skip = true;
-            //    }
-            //}
+            bool skip = false;
+            for (int j = 0; j < newVerts.Count; j++)
+            {
+                if (newVerts[j].Contains(i))
+                {
+                    skip = true;
+                    break;
+                }
+            }
 
-            //if (!skip)
-            //{
+            if (!skip)
+            {
                 ComputeBuffer result = new ComputeBuffer(mesh.vertices.Length, sizeof(int), ComputeBufferType.Append);
                 result.SetCounterValue(0);
 
@@ -86,9 +87,12 @@ public class MechVerticesMerge3_0 : MonoBehaviour
                 }
                 result.Release();
             }
-        //}
+        }
         countBuffer.Release();
         _verticesBuffer.Release();
+
+
+
         return newVerts;
     }
 

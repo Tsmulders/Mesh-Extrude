@@ -1,8 +1,8 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
 
-RWStructuredBuffer<int> indexA;
-RWStructuredBuffer<int> indexB;
+RWStructuredBuffer<int> AIndex;
+RWStructuredBuffer<int> BIndex;
 RWStructuredBuffer<int> indexCheck;
 
 AppendStructuredBuffer<int> Result;
@@ -13,21 +13,21 @@ int max;
 
 //RWStructuredBuffer<int> count;
 //of naar 12 zetten
-[numthreads(5, 24, 1)]
+[numthreads(1, 32, 1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     if (id.x <= max)
     {
-        if (indexCheck[id.x] == indexA[id.y] && InsiteArray[indexB[id.y]] == 0)
+        if (indexCheck[id.x] == AIndex[id.y] && InsiteArray[BIndex[id.y]] == 0)
         {
-            Result.Append(indexB[id.y]);
-            InsiteArray[indexB[id.y]] = 1;
+            Result.Append(BIndex[id.y]);
+            InsiteArray[BIndex[id.y]] = 1;
             //count[0]++;
         }
-        if (indexCheck[id.x] == indexB[id.y] && InsiteArray[indexA[id.y]] == 0)
+        if (indexCheck[id.x] == BIndex[id.y] && InsiteArray[AIndex[id.y]] == 0)
         {
-            Result.Append(indexA[id.y]);
-            InsiteArray[indexA[id.y]] = 1;
+            Result.Append(AIndex[id.y]);
+            InsiteArray[AIndex[id.y]] = 1;
             //count[0]++;
         }
     }
