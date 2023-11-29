@@ -1,6 +1,7 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
-#pragma kernel reassignTri 
+//#pragma kernel reassignTria2
+#pragma kernel reassignTria3
 
 
 // Create a RenderTexture with enableRandomWrite flag and set it
@@ -19,7 +20,7 @@ int firstVertices;
 
 AppendStructuredBuffer<int> Result;
 
-[numthreads(16,1,1)]
+[numthreads(32,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     
@@ -32,11 +33,30 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 }
 
 
+//RWStructuredBuffer<int> triangles;
+//RWStructuredBuffer<int> newVerts;
+//int setTo;
 
+//[numthreads(1, 32, 1)]
+//void reassignTria2(uint3 id : SV_DispatchThreadID)
+//{
+//    if (triangles[id.y] == newVerts[id.x])
+//    {
+//        triangles[id.y] = newVerts[0];
+//    }
+//}
 
-[numthreads(16, 1, 1)]
-void reassignTri(uint3 id : SV_DispatchThreadID)
+RWStructuredBuffer<int> triangles;
+
+int check;
+
+int setTo;
+
+[numthreads(32, 1, 1)]
+void reassignTria3(uint3 id : SV_DispatchThreadID)
 {
-    
-    
+    if (triangles[id.x] == check)
+    {
+        triangles[id.x] = setTo;
+    }
 }

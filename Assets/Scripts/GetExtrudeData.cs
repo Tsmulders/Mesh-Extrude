@@ -12,6 +12,8 @@ public class GetExtrudeData : MonoBehaviour
     {
         List<Edge> alledges = new List<Edge>();
         alledges.AddRange(GetEdgesOfMesh.GetAllEdge(mesh));
+
+        GetEdgesOfMesh.GetAllEdges(mesh);
         //134700
         if (alledges.Count == 0)
         {
@@ -30,6 +32,8 @@ public class GetExtrudeData : MonoBehaviour
                 CircleEdges.RemoveAt(i);
             }
         }
+        if (CircleEdges.Count == 0) return new ExtrudeData[0];
+
         return GetVertices(CircleEdges, alledges, mesh);
     }
 
@@ -195,7 +199,7 @@ public class GetExtrudeData : MonoBehaviour
 
             indexEdges.AddRange(data.Distinct().ToList());
 
-            if(data.Length == 0)
+            if(data.Length <= 1)
             {
                 loop = false;
             }

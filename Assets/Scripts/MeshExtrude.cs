@@ -23,8 +23,10 @@ public class MeshExtrude : MonoBehaviour
     int countver1;
 
     public Vector3[] ar3;
+
+    [SerializeField] private bool welding;
     // Start is called before the first frame update
-    private void Awake()
+    private void Start()
     {
         ExtrudeStart();
         ar3 = GetComponent<MeshFilter>().mesh.vertices;
@@ -46,10 +48,10 @@ public class MeshExtrude : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        GetComponent<MeshFilter>().mesh.vertices = ar3;
-    }
+    //private void Update()
+    //{
+    //    GetComponent<MeshFilter>().mesh.vertices = ar3;
+    //}
 
     void Extrude(GameObject gObject)
     {
@@ -61,13 +63,12 @@ public class MeshExtrude : MonoBehaviour
         float furthestDistance = size.x;
 
         //float furthestDistance = furtherPoint(mesh); // die duurt steet langer hoe meer vertices er zijn
-        threshold = Mathf.Epsilon;
+        threshold = float.Epsilon;
         extrudeStrength = furthestDistance / 50;
-            
-        //MechVerticesMerge2_0.AutoWeld(mesh, threshold); //all vertices aan elkaar maken
-        mesh =  MechVerticesMerge3_0.AutoWeld(mesh, threshold);
-        //mesh = gObject.GetComponent<MeshFilter>().mesh;
-        
+        if (welding)
+        {
+            mesh =  MechVerticesMerge3_0.AutoWeld(mesh, threshold);
+        }
         //extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
 
         extrudevertex = GetExtrudeData.GetData(mesh).ToArray();

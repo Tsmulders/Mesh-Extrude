@@ -50,10 +50,6 @@ public class GetEdgesOfMesh : MonoBehaviour
             
         //}
 
-
-
-
-
         //test 1
         Vector3[] points = mesh.vertices; // The mesh’s vertices
         int[] indicies = mesh.triangles; // The mesh’s triangle indicies
@@ -161,18 +157,11 @@ public class GetEdgesOfMesh : MonoBehaviour
                     {
                         removeindex.Add(edgesJob.indexFound[j]);
                     }
-                    //positionA.RemoveAt(edgesJob.indexFound[j]);
-                    //positionB.RemoveAt(edgesJob.indexFound[j]);
-                    //indexA.RemoveAt(edgesJob.indexFound[j]);
-                    //indexB.RemoveAt(edgesJob.indexFound[j]);
+
                 }
                 else if (!edgesJob.foundOne[j])
                 {
                     edges.Add(edge[j]);
-                    //positionA.Add(edgesJob.positionACheck[j]);
-                    //positionB.Add(edgesJob.positionBCheck[j]);
-                    //indexA.Add(edgesJob.indexACheck[j]);
-                    //indexB.Add(edgesJob.indexBCheck[j]);
                 }
             }
 
@@ -264,8 +253,20 @@ public class GetEdgesOfMesh : MonoBehaviour
         return edges;
     }
 
+    public static List<Edge> GetEdges(Mesh mesh, List<Edge> alledges)
+    {
 
-    public static List<Edge> GetAllEdge(Mesh mesh)
+        List<Edge> edges = new List<Edge>();
+
+
+        foreach (Edge edge in edges)
+        {
+            edge.Draw();
+        }
+        return edges;
+    }
+
+        public static List<Edge> GetAllEdge(Mesh mesh)
     {
         Vector3[] points = mesh.vertices; // The mesh’s vertices
         int[] indicies = mesh.triangles; // The mesh’s triangle indicies
@@ -277,23 +278,6 @@ public class GetEdgesOfMesh : MonoBehaviour
             edges.Add(new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]));
             edges.Add(new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]));
             edges.Add(new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]));
-
-            //Edge edge = new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]);
-            //Edge edge1 = new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]);
-            //Edge edge2 = new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]);
-
-            //if (!edges.Contains(edge))
-            //{
-            //    edges.Add(edge);
-            //}
-            //if (!edges.Contains(edge1))
-            //{
-            //    edges.Add(edge1);
-            //}
-            //if (!edges.Contains(edge2))
-            //{
-            //    edges.Add(edge2);
-            //}
         }
         return edges;
     }
@@ -349,7 +333,7 @@ public class GetEdgesOfMesh : MonoBehaviour
         countBuffer.Release();
         result.Release();
 
-        edges.AddRange(data);
+        //edges.AddRange(data);
 
         return edges;
     }

@@ -15,7 +15,7 @@ public class MechVerticesMerge3_0 : MonoBehaviour
         List<List<int>> newVerts = CloseVertices(mesh, threshold);
         if (newVerts.Count == 0) return mesh;
         Debug.Log(newVerts.Count);
-        tris = ReassignTriangles(newVerts, tris);
+        tris = ReassignTriangles3(newVerts, tris).ToList();
         normals = RecalculateNormals(newVerts, normals);
 
         mesh.triangles = tris.ToArray();
@@ -63,7 +63,7 @@ public class MechVerticesMerge3_0 : MonoBehaviour
                 compute.SetBuffer(_kernel, "Result", result);
 
                 compute.SetInt("firstVertices", i);
-                compute.Dispatch(_kernel, _vertices.Length/ 16, 1, 1);
+                compute.Dispatch(_kernel, _vertices.Length/ 32, 1, 1);
 
                 ComputeBuffer.CopyCount(result, countBuffer, 0);
 
@@ -112,6 +112,66 @@ public class MechVerticesMerge3_0 : MonoBehaviour
             }
         }
         return tris;
+    }
+    private static int[] ReassignTriangles2(List<List<int>> newVerts, List<int> tris)
+    {
+        ComputeShader compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/VerticesWeldingShader.compute");
+        int _kernel = compute.FindKernel("reassignTria");
+        ComputeBuffer trianglesBuffer = new ComputeBuffer(tris.Count, sizeof(int));
+
+        compute.SetBuffer(_kernel, "triangles", trianglesBuffer);
+
+        trianglesBuffer.SetData(tris);
+        int[] data = new int[tris.Count];
+        for (int i = 0; i < newVerts.Count; i++)
+        {
+            int xGroup = newVerts[i].Count / 1;
+            int yGroup = tris.Count / 32;
+
+            ComputeBuffer newVertsBuffer = new ComputeBuffer(newVerts[i].Count, sizeof(int));
+
+            compute.SetBuffer(_kernel, "newVerts", newVertsBuffer);
+
+            trianglesBuffer.SetData(newVerts[i]);
+
+            compute.Dispatch(_kernel, xGroup, yGroup, 1);
+            
+            trianglesBuffer.GetData(data);
+
+            newVertsBuffer.Release();
+        }
+
+        trianglesBuffer.Release();
+        return data;
+    }
+
+    private static int[] ReassignTriangles3(List<List<int>> newVerts, List<int> tris)
+    {
+        ComputeShader compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/VerticesWeldingShader.compute");
+        int _kernel = compute.FindKernel("reassignTria3");
+        ComputeBuffer trianglesBuffer = new ComputeBuffer(tris.Count, sizeof(int));
+
+        compute.SetBuffer(_kernel, "triangles", trianglesBuffer);
+
+        trianglesBuffer.SetData(tris);
+
+        int[] data = new int[tris.Count];
+        int xGroup = tris.Count / 32;
+        for (int i = 0; i < newVerts.Count; i++)
+        {
+            for (int j = 1; j < newVerts[i].Count; j++)
+            {
+                compute.SetInt("check", newVerts[i][j]);
+                compute.SetInt("setTo", newVerts[i][0]);
+
+                compute.Dispatch(_kernel, xGroup, 1, 1);
+
+                trianglesBuffer.GetData(data);
+            }
+        }
+
+        trianglesBuffer.Release();
+        return data;
     }
 
     private static Vector3[] RecalculateNormals(List<List<int>> newVerts, Vector3[] normals)

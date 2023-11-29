@@ -25,6 +25,7 @@ public class Edge
     {
         Debug.DrawLine(A, B, Color.red, 1000);
     }
+
     public bool AlmostEqual(Edge b)
     {
         //vergelijken met epsilon Mathf.Epsilon  
@@ -42,7 +43,4 @@ public class Edge
     {
         return Mathf.Abs(Vector3.Distance(v1, v2)) <= Mathf.Epsilon;
     }
-
-
-
 }
