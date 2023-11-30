@@ -13,14 +13,13 @@ public class GetExtrudeData : MonoBehaviour
         List<Edge> alledges = new List<Edge>();
         alledges.AddRange(GetEdgesOfMesh.GetAllEdge(mesh));
 
-        GetEdgesOfMesh.GetAllEdges(mesh);
         //134700
         if (alledges.Count == 0)
         {
             return new ExtrudeData[0];
         }
         List<Edge> edges = new List<Edge>();
-        edges = GetEdgesOfMesh.GetEdge(mesh, alledges);
+        edges = GetEdgesOfMesh.GetEdges(mesh, alledges);
         //40
         if (edges == null || edges.Count == 0) return new ExtrudeData[0];
         List<Edge[]> CircleEdges = new List<Edge[]>();

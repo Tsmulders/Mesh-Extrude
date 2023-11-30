@@ -11,6 +11,7 @@ using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.tvOS;
 using UnityEngine.UIElements;
 using static UnityEditor.FilePathAttribute;
 
@@ -49,6 +50,8 @@ public class GetEdgesOfMesh : MonoBehaviour
         //{
             
         //}
+
+
 
         //test 1
         Vector3[] points = mesh.vertices; // The mesh’s vertices
@@ -185,11 +188,6 @@ public class GetEdgesOfMesh : MonoBehaviour
             }
         }
 
-
-
-
-
-
         //oude manier doet paar uur over
         //for every two triangle indicies
 
@@ -253,16 +251,77 @@ public class GetEdgesOfMesh : MonoBehaviour
         return edges;
     }
 
-    public static List<Edge> GetEdges(Mesh mesh, List<Edge> alledges)
+    public static List<Edge> GetEdges(Mesh mesh, List<Edge> allEdges)
     {
 
         List<Edge> edges = new List<Edge>();
 
+        List<int> remove = new List<int>();
 
+        int xyGroup = Mathf.RoundToInt((allEdges.Count / 16.0f));
+
+        int[] indexA = new int[allEdges.Count];
+        int[] indexB = new int[allEdges.Count];
+
+        for (int i = 0; i < allEdges.Count; i++)
+        {
+            indexA[i] = allEdges[i].indexA;
+            indexB[i] = allEdges[i].indexB;
+        }
+
+        ComputeShader compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/GetEdgeOuterShader.compute");
+        int _kernel = compute.FindKernel("CSMain");
+
+
+        ComputeBuffer result = new ComputeBuffer(allEdges.Count * 10, sizeof(int), ComputeBufferType.Append);
+        result.SetCounterValue(0);
+
+        ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
+        ComputeBuffer indexABuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
+        ComputeBuffer indexBBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
+
+        compute.SetBuffer(_kernel, "result", result);
+        compute.SetBuffer(_kernel, "indexA", indexABuffer);
+        compute.SetBuffer(_kernel, "indexB", indexBBuffer);
+
+        indexABuffer.SetData(indexA);
+        indexBBuffer.SetData(indexB);
+
+        compute.Dispatch(_kernel, xyGroup, xyGroup, 1);
+
+        ComputeBuffer.CopyCount(result, countBuffer, 0);
+
+        int[] counter = new int[1] { 0 };
+        countBuffer.GetData(counter);
+
+        int count = counter[0];
+
+        int[] data = new int[count];
+
+        result.GetData(data);
+
+        result.Release();
+        countBuffer.Release();
+        indexABuffer.Release();
+        indexBBuffer.Release();
+
+        remove.AddRange(data);
+
+        remove = remove.Distinct().ToList();
+
+        remove.Sort();
+        remove.Reverse();
+
+        for (int i = 0; i < remove.Count; i++)
+        {
+            allEdges.RemoveAt(remove[i]);
+        }
+            
         foreach (Edge edge in edges)
         {
             edge.Draw();
         }
+
         return edges;
     }
 
@@ -290,7 +349,7 @@ public class GetEdgesOfMesh : MonoBehaviour
         public int indexB;
     }
 
-    public static List<Edge> GetAllEdges(Mesh mesh)
+    public static List<data> GetAllEdges(Mesh mesh)
     {
         ComputeShader compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/GetAllEdgesShader.compute");
         int _kernel = compute.FindKernel("CSMain");
@@ -315,7 +374,7 @@ public class GetEdgesOfMesh : MonoBehaviour
         vertices.SetData(points);
         trianglesBuffer.SetData(triangles);
 
-        compute.Dispatch(_kernel, xGroup, 1, 1);
+        compute.Dispatch(_kernel, xGroup, xGroup, 1);
         
         ComputeBuffer.CopyCount(result, countBuffer, 0);
 
@@ -335,8 +394,6 @@ public class GetEdgesOfMesh : MonoBehaviour
 
         //edges.AddRange(data);
 
-        return edges;
+        return data.ToList();
     }
 }
-
-
