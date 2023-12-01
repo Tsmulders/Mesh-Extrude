@@ -258,20 +258,26 @@ public class GetEdgesOfMesh : MonoBehaviour
 
         List<int> remove = new List<int>();
 
-        int xyGroup = Mathf.RoundToInt((allEdges.Count / 16.0f));
+        int xGroup = Mathf.RoundToInt((allEdges.Count / 15.0f));
+        int yGroup = Mathf.RoundToInt((allEdges.Count / 15.0f));
 
         int[] indexA = new int[allEdges.Count];
         int[] indexB = new int[allEdges.Count];
+        Vector3[] positionA = new Vector3[allEdges.Count];
+        Vector3[] positionB = new Vector3[allEdges.Count];
+        int[] foundOne = new int[allEdges.Count];
 
         for (int i = 0; i < allEdges.Count; i++)
         {
             indexA[i] = allEdges[i].indexA;
             indexB[i] = allEdges[i].indexB;
+            positionA[i] = allEdges[i].A;
+            positionB[i] = allEdges[i].B;
+            foundOne[i] = 0;
         }
 
         ComputeShader compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/GetEdgeOuterShader.compute");
-        int _kernel = compute.FindKernel("CSMain");
-
+        int _kernel = compute.FindKernel("CSMain3");
 
         ComputeBuffer result = new ComputeBuffer(allEdges.Count * 10, sizeof(int), ComputeBufferType.Append);
         result.SetCounterValue(0);
@@ -279,15 +285,25 @@ public class GetEdgesOfMesh : MonoBehaviour
         ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
         ComputeBuffer indexABuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
         ComputeBuffer indexBBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
+        ComputeBuffer positionABuffer = new ComputeBuffer(allEdges.Count, sizeof(float) * 3);
+        ComputeBuffer positionBBuffer = new ComputeBuffer(allEdges.Count, sizeof(float) * 3);
+
+        ComputeBuffer foundOneBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
 
         compute.SetBuffer(_kernel, "result", result);
         compute.SetBuffer(_kernel, "indexA", indexABuffer);
         compute.SetBuffer(_kernel, "indexB", indexBBuffer);
+        compute.SetBuffer(_kernel, "positionA", positionABuffer);
+        compute.SetBuffer(_kernel, "positionB", positionBBuffer);
+        compute.SetBuffer(_kernel, "foundOne", foundOneBuffer);
 
         indexABuffer.SetData(indexA);
         indexBBuffer.SetData(indexB);
+        positionABuffer.SetData(positionA);
+        positionBBuffer.SetData(positionB);
+        foundOneBuffer.SetData(foundOne);
 
-        compute.Dispatch(_kernel, xyGroup, xyGroup, 1);
+        compute.Dispatch(_kernel, xGroup, yGroup, 1);
 
         ComputeBuffer.CopyCount(result, countBuffer, 0);
 
@@ -299,11 +315,15 @@ public class GetEdgesOfMesh : MonoBehaviour
         int[] data = new int[count];
 
         result.GetData(data);
+        foundOneBuffer.GetData(foundOne);
 
         result.Release();
         countBuffer.Release();
         indexABuffer.Release();
         indexBBuffer.Release();
+        positionABuffer.Release();
+        positionBBuffer.Release();
+        foundOneBuffer.Release();
 
         remove.AddRange(data);
 
@@ -316,7 +336,16 @@ public class GetEdgesOfMesh : MonoBehaviour
         {
             allEdges.RemoveAt(remove[i]);
         }
-            
+        //134700 en moet 40 worden 134660
+
+        for (int i = 0; i < foundOne.Length; i++)
+        {
+            if (foundOne[i] == 0)
+            {
+                edges.Add(allEdges[i]);
+            }
+        }
+
         foreach (Edge edge in edges)
         {
             edge.Draw();

@@ -19,7 +19,9 @@ public class GetExtrudeData : MonoBehaviour
             return new ExtrudeData[0];
         }
         List<Edge> edges = new List<Edge>();
-        edges = GetEdgesOfMesh.GetEdges(mesh, alledges);
+        edges = GetEdgesOfMesh.GetEdge(mesh, alledges);
+        List<Edge> edges2 = new List<Edge>();
+        edges2 = GetEdgesOfMesh.GetEdges(mesh, alledges);
         //40
         if (edges == null || edges.Count == 0) return new ExtrudeData[0];
         List<Edge[]> CircleEdges = new List<Edge[]>();
@@ -31,7 +33,7 @@ public class GetExtrudeData : MonoBehaviour
                 CircleEdges.RemoveAt(i);
             }
         }
-        if (CircleEdges.Count == 0) return new ExtrudeData[0];
+         if (CircleEdges.Count == 0) return new ExtrudeData[0];
 
         return GetVertices(CircleEdges, alledges, mesh);
     }

@@ -1,5 +1,7 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
+#pragma kernel CSMain2
+#pragma kernel CSMain3
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
@@ -17,10 +19,7 @@ RWStructuredBuffer<data> edges;
 RWStructuredBuffer<int> indexA;
 RWStructuredBuffer<int> indexB;
 
-//RWStructuredBuffer<float3> positionA;
-//RWStructuredBuffer<float3> positionB;
-
-//RWStructuredBuffer<bool> foundOne;
+RWStructuredBuffer<int> foundOne;
 //RWStructuredBuffer<int> indexFound;
 
 //RWStructuredBuffer<float3> positionACheck;
@@ -29,15 +28,72 @@ RWStructuredBuffer<int> indexB;
 
 AppendStructuredBuffer<int> result;
 
-[numthreads(16, 16,1)]
+float Epsilon;
+
+int count;
+
+[numthreads(15, 15,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
+    if ((indexA[id.x] == indexA[id.y] &&
+        indexB[id.x] == indexB[id.y]) ||
+        (indexA[id.x] == indexB[id.y] &&
+        indexB[id.x] == indexA[id.y]))
+    {
+        if (id.x != id.y)
+        {
+            result.Append(id.x);
+        }
+    }
+}
 
-    if (indexA[id.x] == indexA[id.y] &&
-        indexB[id.x] == indexB[id.y] ||
-        indexA[id.x] == indexB[id.y] &&
-        indexB[id.x] == indexA[id.y] &&
-        id.x != id.y)
+
+[numthreads(15, 15, 1)]
+void CSMain2(uint3 id : SV_DispatchThreadID)
+{
+    
+    if ((indexA[id.x] == indexA[id.y] &&
+        indexB[id.x] == indexB[id.y]) ||
+        (indexA[id.x] == indexB[id.y] &&
+        indexB[id.x] == indexA[id.y]))
+    {
+        if (id.x != id.y)
+        {
+            foundOne[id.x] = 1;
+
+        }
+    }
+   
+    if (id.y == 134700 && foundOne[id.x] == 0)
+    {
+        result.Append(id.x);
+    }
+}
+
+
+RWStructuredBuffer<float3> positionA;
+
+RWStructuredBuffer<float3> positionB;
+
+[numthreads(15, 15, 1)]
+void CSMain3(uint3 id : SV_DispatchThreadID)
+{
+    
+    if ((distance(positionA[id.x], positionA[id.y]) <= Epsilon
+        &&
+        distance(positionB[id.x], positionB[id.y]) <= Epsilon)
+        ||
+        (distance(positionA[id.x], positionB[id.y]) <= Epsilon
+        &&
+        distance(positionB[id.x], positionA[id.y]) <= Epsilon))
+    {
+        if (id.x != id.y)
+        {
+            foundOne[id.x] = 1;
+        }
+    }
+   //1498200
+    if (id.y == 1498200 && foundOne[id.x] == 0)
     {
         result.Append(id.x);
     }
