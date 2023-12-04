@@ -19,8 +19,8 @@ public class MeshExtrude : MonoBehaviour
     public float threshold = 0.0001f;
     public float extrudeStrength = 0;
 
-    ExtrudeData[] extrudevertex;
-    int countver1;
+    ExtrudeData[] extrudeVertex; 
+    int countVer1;
 
     public Vector3[] ar3;
 
@@ -28,13 +28,14 @@ public class MeshExtrude : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+
         ExtrudeStart();
         ar3 = GetComponent<MeshFilter>().mesh.vertices;
     }
 
     void ExtrudeStart()
     {
-        
+        //wil also check child if need it be extruded 
         if (transform.childCount > 0)
         {
             for (int i = 0; i < transform.childCount; i++)
@@ -42,6 +43,7 @@ public class MeshExtrude : MonoBehaviour
                 Extrude(transform.GetChild(i).gameObject);
             }
         }
+        //check if main object has a mech filter 
         if (GetComponent<MeshFilter>() != null)
         {
             Extrude(gameObject);
@@ -55,49 +57,62 @@ public class MeshExtrude : MonoBehaviour
 
     void Extrude(GameObject gObject)
     {
+        //get mech
         Mesh mesh;
         listMech = new List<Mesh>();
         mesh = gObject.GetComponent<MeshFilter>().mesh;
         MeshRenderer renderer = gObject.GetComponent<MeshRenderer>();
+
+        //get extrude strength
         Vector3 size = renderer.bounds.size;
         float furthestDistance = size.x;
-
-        //float furthestDistance = furtherPoint(mesh); // die duurt steet langer hoe meer vertices er zijn
+                                                                    //float furthestDistance = furtherPoint(mesh); // die duurt steet langer hoe meer vertices er zijn
         threshold = float.Epsilon;
         extrudeStrength = furthestDistance / 50;
+
+        //make sure that all triangles are connected to each other.
         if (welding)
         {
             mesh =  MechVerticesMerge3_0.AutoWeld(mesh, threshold);
         }
-        //extrudevertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
 
-        extrudevertex = GetExtrudeData.GetData(mesh).ToArray();
-        //[121]
-        if (extrudevertex.Length == 0)
+        //get all extrude data 
+                                                                    //extrudeVertex = flatpolygonalseeker.LooseSurface(mesh).ToArray();
+        extrudeVertex = GetExtrudeData.GetData(mesh).ToArray();
+
+        //check if something can be extruded.
+        if (extrudeVertex.Length == 0)
         {
             Debug.Log("there are no lose polygons");
             return;
         }
-        Debug.Log(extrudevertex[0].indexEdges.Length);
-        for (int i = 0; i < extrudevertex.Length; i++)
+
+        Debug.Log(extrudeVertex[0].indexEdges.Length);
+
+        //this wil extrude flat polygon also if there are more flat polygons.
+        for (int i = 0; i < extrudeVertex.Length; i++)
         {
             Mesh mesh2;
-            mesh2 = clonemesh(mesh, extrudevertex[i].indexEdges, extrudeStrength);
-
+            //whil make a clone out of the flat polygons vertices
+            mesh2 = clonemesh(mesh, extrudeVertex[i].indexEdges, extrudeStrength);
+            //combines clone and main mech
             mesh = gObject.GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
 
             triangle = gObject.GetComponent<MeshFilter>().mesh.triangles;
 
-            triangle = gObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(extrudevertex[i].edgesCircle, extrudevertex[i].indexEdges, mesh).ToArray();
+            //connect the main mech and clone to each other with new triangles.
+            triangle = gObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(extrudeVertex[i].edgesCircle, extrudeVertex[i].indexEdges, mesh).ToArray();
 
             mesh = gObject.GetComponent<MeshFilter>().mesh;
         }
+        //Recalculate the Mesh (Normals, Tangents, Bounds, UVDistributionMetrics)
         RecalculateMesh(mesh);
     }
 
 
     void RecalculateMesh(Mesh meshRecalculate)
     {
+        //Recalculate the Mesh
         meshRecalculate.RecalculateNormals();
         meshRecalculate.RecalculateTangents();
         meshRecalculate.RecalculateBounds();
@@ -163,7 +178,7 @@ public class MeshExtrude : MonoBehaviour
 
         Mesh mesh = new Mesh();
         mesh.CombineMeshes(combine, true, false, false);
-        countver1 = mesh.vertices.Length - addition.vertices.Length;
+        countVer1 = mesh.vertices.Length - addition.vertices.Length;
         return mesh;
     }
 
@@ -197,36 +212,36 @@ public class MeshExtrude : MonoBehaviour
         //calculate the new triangles
         for (int i = 0; i < edgePoints.Length; i++)
         {
-            oneTriangel[0] = edgePoints2[i].indexB + countver1;
+            oneTriangel[0] = edgePoints2[i].indexB + countVer1;
             oneTriangel[1] = edgePoints[i].indexB;
             oneTriangel[2] = edgePoints[i].indexA;
             trianglesList.AddRange(oneTriangel);
 
-            oneTriangel[0] = edgePoints2[i].indexB + countver1;
+            oneTriangel[0] = edgePoints2[i].indexB + countVer1;
             oneTriangel[1] = edgePoints[i].indexA;
-            oneTriangel[2] = edgePoints2[i].indexA + countver1;
+            oneTriangel[2] = edgePoints2[i].indexA + countVer1;
             trianglesList.AddRange(oneTriangel);
         }
         return trianglesList;
     }
 
-    float furtherPoint(Mesh mesh)
-    {
-        float furthestDistance = 0;
-        Vector3[] vertices = mesh.vertices;
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            for (int j = 0; j < vertices.Length; j++)
-            {
-                float distance = Vector3.Distance(vertices[i], vertices[j]);
-                if (furthestDistance < distance)
-                {
-                    furthestDistance = distance;
-                }
-            }
-        }
-        return furthestDistance;
-    }
+    //float furtherPoint(Mesh mesh)
+    //{
+    //    float furthestDistance = 0;
+    //    Vector3[] vertices = mesh.vertices;
+    //    for (int i = 0; i < vertices.Length; i++)
+    //    {
+    //        for (int j = 0; j < vertices.Length; j++)
+    //        {
+    //            float distance = Vector3.Distance(vertices[i], vertices[j]);
+    //            if (furthestDistance < distance)
+    //            {
+    //                furthestDistance = distance;
+    //            }
+    //        }
+    //    }
+    //    return furthestDistance;
+    //}
 
 
 

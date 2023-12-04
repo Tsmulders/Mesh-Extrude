@@ -30,7 +30,7 @@ AppendStructuredBuffer<int> result;
 
 float Epsilon;
 
-int count;
+
 
 [numthreads(15, 15,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
@@ -74,8 +74,9 @@ void CSMain2(uint3 id : SV_DispatchThreadID)
 RWStructuredBuffer<float3> positionA;
 
 RWStructuredBuffer<float3> positionB;
+int count;
 
-[numthreads(15, 15, 1)]
+[numthreads(32, 32, 1)]
 void CSMain3(uint3 id : SV_DispatchThreadID)
 {
     
@@ -92,12 +93,13 @@ void CSMain3(uint3 id : SV_DispatchThreadID)
             foundOne[id.x] = 1;
         }
     }
-   //1498200
-    if (id.y == 1498200 && foundOne[id.x] == 0)
-    {
-        result.Append(id.x);
-    }
+
+    //if (id.y == count && foundOne[id.x] == 0)
+    //{
+    //    result.Append(id.x);
+    //}
 }
+
 
 //bool check(float3 v1, float3 v2)
 //{

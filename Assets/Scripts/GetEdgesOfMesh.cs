@@ -257,87 +257,94 @@ public class GetEdgesOfMesh : MonoBehaviour
         List<Edge> edges = new List<Edge>();
 
         List<int> remove = new List<int>();
-
-        int xGroup = Mathf.RoundToInt((allEdges.Count / 15.0f));
-        int yGroup = Mathf.RoundToInt((allEdges.Count / 15.0f));
-
+        //set x & y tread groups can not be higher than 65535
+        int xGroup = Mathf.RoundToInt((allEdges.Count / 32.0f));
+        int yGroup = Mathf.RoundToInt((allEdges.Count / 32.0f));
+       
         int[] indexA = new int[allEdges.Count];
         int[] indexB = new int[allEdges.Count];
         Vector3[] positionA = new Vector3[allEdges.Count];
         Vector3[] positionB = new Vector3[allEdges.Count];
         int[] foundOne = new int[allEdges.Count];
-
+        //splits all Edges to different array
         for (int i = 0; i < allEdges.Count; i++)
         {
-            indexA[i] = allEdges[i].indexA;
-            indexB[i] = allEdges[i].indexB;
+            //indexA[i] = allEdges[i].indexA;
+            //indexB[i] = allEdges[i].indexB;
             positionA[i] = allEdges[i].A;
             positionB[i] = allEdges[i].B;
             foundOne[i] = 0;
         }
-
+        //get compute shader from map
         ComputeShader compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/GetEdgeOuterShader.compute");
         int _kernel = compute.FindKernel("CSMain3");
 
-        ComputeBuffer result = new ComputeBuffer(allEdges.Count * 10, sizeof(int), ComputeBufferType.Append);
-        result.SetCounterValue(0);
+        //ComputeBuffer result = new ComputeBuffer(allEdges.Count * 10, sizeof(int), ComputeBufferType.Append);
+        //result.SetCounterValue(0);
 
-        ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
-        ComputeBuffer indexABuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
-        ComputeBuffer indexBBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
+        //create compute buffer
+        //ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
+        //ComputeBuffer indexABuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
+        //ComputeBuffer indexBBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
         ComputeBuffer positionABuffer = new ComputeBuffer(allEdges.Count, sizeof(float) * 3);
         ComputeBuffer positionBBuffer = new ComputeBuffer(allEdges.Count, sizeof(float) * 3);
-
         ComputeBuffer foundOneBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
 
-        compute.SetBuffer(_kernel, "result", result);
-        compute.SetBuffer(_kernel, "indexA", indexABuffer);
-        compute.SetBuffer(_kernel, "indexB", indexBBuffer);
+        //link buffer
+        //compute.SetBuffer(_kernel, "result", result);1`1
+        //compute.SetBuffer(_kernel, "indexA", indexABuffer);
+        //compute.SetBuffer(_kernel, "indexB", indexBBuffer);
         compute.SetBuffer(_kernel, "positionA", positionABuffer);
         compute.SetBuffer(_kernel, "positionB", positionBBuffer);
         compute.SetBuffer(_kernel, "foundOne", foundOneBuffer);
 
-        indexABuffer.SetData(indexA);
-        indexBBuffer.SetData(indexB);
+        //set data to compute buffers
+        //indexABuffer.SetData(indexA);
+        //indexBBuffer.SetData(indexB);
         positionABuffer.SetData(positionA);
         positionBBuffer.SetData(positionB);
         foundOneBuffer.SetData(foundOne);
+        compute.SetInt("count", allEdges.Count);
 
+        //dispatch to compute shader
         compute.Dispatch(_kernel, xGroup, yGroup, 1);
 
-        ComputeBuffer.CopyCount(result, countBuffer, 0);
+        //ComputeBuffer.CopyCount(result, countBuffer, 0);
 
-        int[] counter = new int[1] { 0 };
-        countBuffer.GetData(counter);
+        //int[] counter = new int[1] { 0 };
+        ////countBuffer.GetData(counter);
 
-        int count = counter[0];
+        //int count = counter[0];
 
-        int[] data = new int[count];
+        //int[] data = new int[count];
 
-        result.GetData(data);
+        //result.GetData(data);
+
+        //get data
         foundOneBuffer.GetData(foundOne);
 
-        result.Release();
-        countBuffer.Release();
-        indexABuffer.Release();
-        indexBBuffer.Release();
+        //release all compute buffers
+        //result.Release();
+        //countBuffer.Release();
+        //indexABuffer.Release();
+        //indexBBuffer.Release();
         positionABuffer.Release();
         positionBBuffer.Release();
         foundOneBuffer.Release();
 
-        remove.AddRange(data);
+        ///remove.AddRange(data);
 
-        remove = remove.Distinct().ToList();
+        //remove = remove.Distinct().ToList();
 
-        remove.Sort();
-        remove.Reverse();
+        //remove.Sort();
+        //remove.Reverse();
 
-        for (int i = 0; i < remove.Count; i++)
-        {
-            allEdges.RemoveAt(remove[i]);
-        }
-        //134700 en moet 40 worden 134660
+        //for (int i = 0; i < remove.Count; i++)
+        //{
+        //    allEdges.RemoveAt(remove[i]);
+        //}
 
+        //please all outer edge in site a list
         for (int i = 0; i < foundOne.Length; i++)
         {
             if (foundOne[i] == 0)
@@ -345,28 +352,30 @@ public class GetEdgesOfMesh : MonoBehaviour
                 edges.Add(allEdges[i]);
             }
         }
-
+        //draw outer edge
         foreach (Edge edge in edges)
         {
             edge.Draw();
         }
-
+        //return outer edge
         return edges;
     }
 
-        public static List<Edge> GetAllEdge(Mesh mesh)
+    public static List<Edge> GetAllEdge(Mesh mesh)
     {
         Vector3[] points = mesh.vertices; // The mesh’s vertices
-        int[] indicies = mesh.triangles; // The mesh’s triangle indicies
+        int[] triangles = mesh.triangles; // The mesh’s triangle
 
         List<Edge> edges = new List<Edge>();
 
-        for (int i = 0; i < indicies.Length - 1; i += 3)
+        //create new Edge objects
+        for (int i = 0; i < triangles.Length - 1; i += 3)
         {
-            edges.Add(new Edge(points[indicies[i]], points[indicies[i + 1]], indicies[i], indicies[i + 1]));
-            edges.Add(new Edge(points[indicies[i + 1]], points[indicies[i + 2]], indicies[i + 1], indicies[i + 2]));
-            edges.Add(new Edge(points[indicies[i + 2]], points[indicies[i]], indicies[i + 2], indicies[i]));
+            edges.Add(new Edge(points[triangles[i]], points[triangles[i + 1]], triangles[i], triangles[i + 1]));
+            edges.Add(new Edge(points[triangles[i + 1]], points[triangles[i + 2]], triangles[i + 1], triangles[i + 2]));
+            edges.Add(new Edge(points[triangles[i + 2]], points[triangles[i]], triangles[i + 2], triangles[i]));
         }
+        //return all edges
         return edges;
     }
 
