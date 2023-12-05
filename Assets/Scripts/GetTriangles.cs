@@ -25,9 +25,10 @@ public class GetTriangles : MonoBehaviour
     public static List<Triangles> getTrianglesGivenIndex(int[] vertex, Mesh mesh)
     {
         List<Triangles> alltrianglesList = new List<Triangles>();
+        //getall the triangles of the object
         alltrianglesList = getAllTiangles(mesh);
         List<Triangles> trianglesList = new List<Triangles>();
-
+        //
         for (int i = 0;i < vertex.Length;i++)
         {
             for (int j = 0; j < alltrianglesList.Count; j++)

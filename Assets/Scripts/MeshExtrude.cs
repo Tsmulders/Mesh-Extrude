@@ -94,14 +94,14 @@ public class MeshExtrude : MonoBehaviour
         {
             Mesh mesh2;
             //whil make a clone out of the flat polygons vertices
-            mesh2 = clonemesh(mesh, extrudeVertex[i].indexEdges, extrudeStrength);
+            mesh2 = cloneMesh(mesh, extrudeVertex[i].indexEdges, extrudeStrength);
             //combines clone and main mech
             mesh = gObject.GetComponent<MeshFilter>().mesh = CombinerMesh(mesh, mesh2);
 
             triangle = gObject.GetComponent<MeshFilter>().mesh.triangles;
 
             //connect the main mech and clone to each other with new triangles.
-            triangle = gObject.GetComponent<MeshFilter>().mesh.triangles = CennectMeshes(extrudeVertex[i].edgesCircle, extrudeVertex[i].indexEdges, mesh).ToArray();
+            triangle = gObject.GetComponent<MeshFilter>().mesh.triangles = ConnectMeshes(extrudeVertex[i].edgesCircle, extrudeVertex[i].indexEdges, mesh).ToArray();
 
             mesh = gObject.GetComponent<MeshFilter>().mesh;
         }
@@ -119,34 +119,31 @@ public class MeshExtrude : MonoBehaviour
         meshRecalculate.RecalculateUVDistributionMetrics();
     }
 
-    private Mesh clonemesh(Mesh original, int[] verticesIndex, float extrudeStrength)
+    private Mesh cloneMesh(Mesh original, int[] verticesIndex, float extrudeStrength)
     {
         //om de triangles te krijgen sla ze al op in get edges of mesh
         Mesh clone = new Mesh();
 
-
         List<Vector3> vertices = new List<Vector3>();
         List<Vector2> uv = new List<Vector2>();
         List<int> triangles = new List<int>();
-
+        //create new vertices 
         for (int i = 0; i < verticesIndex.Length; i++)
         {
             vertices.Add(original.vertices[verticesIndex[i]] + -original.normals[verticesIndex[i]] * extrudeStrength);
             uv.Add(original.uv[verticesIndex[i]]);
         }
-
+        
         Triangles[] triangles1;
+        //get the triangles are need to be connected
         triangles1 = GetTriangles.getTrianglesGivenIndex(verticesIndex, original).ToArray();
-
+        //add triangles to the list
         for (int i = 0; i < triangles1.Length; i++)
         {
             triangles.AddRange(triangles1[i].triangleIndex);
         }
 
-        //index zit niet meer op de zelfde plaats. daarom kan de triagles het niet vinden. eerst te info finden hoe die moet veranderen en daarna het aanpassen
-
-        List<List<int>> trianglesIndexchange = new List<List<int>>();
-        List<int> Indexchange = new List<int>();
+        //reassigned triangles to vertices index
         for (int i = 0; i < verticesIndex.Length; i++)
         {
             for (int j = 0; j < triangles.Count; j++)
@@ -157,19 +154,20 @@ public class MeshExtrude : MonoBehaviour
                 }
             }
         }
-
+        //set to clone mesh 
         triangles.Reverse();
         clone.vertices = vertices.ToArray();
         clone.uv = uv.ToArray();
         clone.triangles = triangles.ToArray();
 
         clone.RecalculateNormals();
-
+        //return clone of that part of the mesh.
         return clone;
     }
 
     Mesh CombinerMesh(in Mesh original, in Mesh addition)
     {
+        //set original and addition in a array
         CombineInstance[] combine = new CombineInstance[2];
         combine[0].mesh = original;
         combine[0].transform = transform.localToWorldMatrix;
@@ -177,23 +175,28 @@ public class MeshExtrude : MonoBehaviour
         combine[1].transform = transform.localToWorldMatrix;
 
         Mesh mesh = new Mesh();
+        // Combine the tho meshes
         mesh.CombineMeshes(combine, true, false, false);
+        //saves the count of the mesh - additional
         countVer1 = mesh.vertices.Length - addition.vertices.Length;
+        //return combine mesh
         return mesh;
     }
 
-    List<int> CennectMeshes(Edge[] edgePoints, int[] verticesIndex, Mesh mesh)
+    List<int> ConnectMeshes(Edge[] edgePoints, int[] verticesIndex, Mesh mesh)
     {
         List<int> trianglesList = new List<int>();
         int[] oneTriangel = new int[3];
         trianglesList.AddRange(mesh.triangles);
         List<Edge> edgePoints2 = new List<Edge>();
 
+        //create new edge point
         for (int i = 0; i < edgePoints.Length; i++)
         {
             edgePoints2.Add(new Edge(edgePoints[i].A, edgePoints[i].B, edgePoints[i].indexA, edgePoints[i].indexB));
         }
 
+        //set new edge point to the correct index
         for (int i = 0; i < edgePoints2.Count; i++)
         {
             for (int j = 0; j < verticesIndex.Length; j++)
@@ -222,6 +225,7 @@ public class MeshExtrude : MonoBehaviour
             oneTriangel[2] = edgePoints2[i].indexA + countVer1;
             trianglesList.AddRange(oneTriangel);
         }
+        //return new triangles
         return trianglesList;
     }
 

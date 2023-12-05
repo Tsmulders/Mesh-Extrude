@@ -28,7 +28,7 @@ RWStructuredBuffer<int> foundOne;
 
 AppendStructuredBuffer<int> result;
 
-float Epsilon;
+
 
 
 
@@ -72,14 +72,16 @@ void CSMain2(uint3 id : SV_DispatchThreadID)
 
 
 RWStructuredBuffer<float3> positionA;
-
 RWStructuredBuffer<float3> positionB;
-int count;
 
+int count;
+float Epsilon;
+
+//get outer edge
 [numthreads(32, 32, 1)]
 void CSMain3(uint3 id : SV_DispatchThreadID)
 {
-    
+    //checks the 2 positions on epsilon
     if ((distance(positionA[id.x], positionA[id.y]) <= Epsilon
         &&
         distance(positionB[id.x], positionB[id.y]) <= Epsilon)

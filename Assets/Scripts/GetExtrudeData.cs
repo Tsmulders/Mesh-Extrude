@@ -58,63 +58,71 @@ public class GetExtrudeData : MonoBehaviour
         List<int> notChosen = new List<int>();
         int j = 0;
 
-        List<Edge> edgesdone = new List<Edge>();
-        edgesdone.AddRange(edges);
-
+        List<Edge> edgesDone = new List<Edge>();
+        edgesDone.AddRange(edges);
+    //back point
     _l2:
-        for (int i = 0; i < edgesdone.Count; i++)
+        //loop throw edges that needs to be checked
+        for (int i = 0; i < edgesDone.Count; i++)
         {
-            if (edges[i].indexA == edgesdone[i].indexB)
+            //check if index is not the same
+            if (edges[i].indexA == edgesDone[i].indexB)
             {
                 i++;
             }
-            if (edgesCircle[j].indexB == edgesdone[i].indexA)
+            //check if index b is the same than index a 
+            if (edgesCircle[j].indexB == edgesDone[i].indexA)
             {
-                if (!edgesCircle.Contains(edgesdone[i]))
+                //check if not already contains
+                if (!edgesCircle.Contains(edgesDone[i]))
                 {
-                    edgesCircle.Add(edgesdone[i]);
+                    edgesCircle.Add(edgesDone[i]);
                     j++;
                     goto _l2;
                 }
             }
-            if (!edgesCircle.Contains(edgesdone[i]))
+            //add if is not connected to edge
+            if (!edgesCircle.Contains(edgesDone[i]))
             {
                 notChosen.Add(i);
             }
         }
+        //check if index a of the first index is the same as index b of the last index.
         if (edgesCircle[0].indexA != edgesCircle[edgesCircle.Count - 1].indexB)
         {
             for (int i = 0; i < edgesCircle.Count; i++)
             {
-                edgesdone.Remove(edgesCircle[i]);
+                edgesDone.Remove(edgesCircle[i]);
             }
-            if (edgesdone.Count > 0)
+            //reset if there are more flat polygons.
+            if (edgesDone.Count > 0)
             {
                 edgesCircle.Clear();
-                edgesCircle.Add(edgesdone[0]);
+                edgesCircle.Add(edgesDone[0]);
                 notChosen.Clear();
                 j = 0;
                 goto _l2;
             }
         }
-        
+        //if is flatpolygon add to list
         circleEdges.Add(edgesCircle.ToArray());
-
+        //reset if there are more flat polygons.
         if (notChosen.Count != 0)
         {
             for (int i = 0; i < edgesCircle.Count; i++)
             {
-                edgesdone.Remove(edgesCircle[i]);
+                edgesDone.Remove(edgesCircle[i]);
             }
-            if (edgesdone.Count > 0)
+            if (edgesDone.Count > 0)
             {
                 edgesCircle.Clear();
-                edgesCircle.Add(edgesdone[0]);
+                edgesCircle.Add(edgesDone[0]);
                 notChosen.Clear();
                 j = 0;
                 goto _l2;
             }
         }
+        //return all outer edges of object
         return circleEdges;
     }
 
@@ -138,36 +146,42 @@ public class GetExtrudeData : MonoBehaviour
         List<ExtrudeData> extrude = new List<ExtrudeData>();
         List<int> nextCheck = new List<int>();
 
+        //get compute shader from map
         ComputeShader compute;
         compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/ExtrudeDataShader.compute");
         int _kernel = compute.FindKernel("CSMain");
+        //set y treat group
         yGroup = Mathf.RoundToInt((allEdges.Count / 32.0f));
         Debug.Log(yGroup);
 
-        
+        //create compute buffers
         ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
         ComputeBuffer indexABuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
         ComputeBuffer indexBBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
         ComputeBuffer InsiteArrayBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
 
-
+        //link buffers
         compute.SetBuffer(_kernel, "AIndex", indexABuffer);
         compute.SetBuffer(_kernel, "BIndex", indexBBuffer);
         compute.SetBuffer(_kernel, "InsiteArray", InsiteArrayBuffer);
 
+        //prepare array to sent to compute shader
         for (int j = 0; j < allEdges.Count; j++)
         {
             indexA[j] = allEdges[j].indexA;
             indexB[j] = allEdges[j].indexB;
         }
 
-
+        //set compute buffer data
         indexABuffer.SetData(indexA);
         indexBBuffer.SetData(indexB);
 
+    //back point
     _L1:
+
         int[] InsiteArray = new int[verticesCount];
         InsiteArray[0] = 0;
+        //prepare data for compute shader
         for (int j = 0; j < CircleEdges[i].Length; j++)
         {
             nextCheck.Add(CircleEdges[i][j].indexA);
@@ -175,45 +189,54 @@ public class GetExtrudeData : MonoBehaviour
             InsiteArray[CircleEdges[i][j].indexA] = 1;
             InsiteArray[CircleEdges[i][j].indexB] = 1;
         }
-        indexEdges.AddRange(nextCheck);
-        InsiteArrayBuffer.SetData(InsiteArray);
 
+        indexEdges.AddRange(nextCheck);
+        //set compute buffer data
+        InsiteArrayBuffer.SetData(InsiteArray);
+        //
         while (loop)
         {
+            //set x treat group
             xGroup = Mathf.RoundToInt((nextCheck.Count / 1));
             Debug.Log(nextCheck.Count);
             Debug.Log(xGroup);
+            //create append buffer
             ComputeBuffer result;
             result = new ComputeBuffer(allEdges.Count * 50, sizeof(float), ComputeBufferType.Append);
             result.SetCounterValue(0);
+            //create compute buffers
             ComputeBuffer indexCheck = new ComputeBuffer(nextCheck.Count, sizeof(float));
-
+            //link buffers
             compute.SetBuffer(_kernel, "Result", result);
             compute.SetBuffer(_kernel, "indexCheck", indexCheck);
-
+            //set compute buffer data
             indexCheck.SetData(nextCheck.ToArray());
             compute.SetInt("max", nextCheck.Count);
-
+            //dispatch to compute shaders
             compute.Dispatch(_kernel, xGroup, yGroup, 1);
+            //will copy the count of the append buffer
             ComputeBuffer.CopyCount(result, countBuffer, 0);
-
+            
             int[] counter = new int[1] {0};
+            //set the count in a array
             countBuffer.GetData(counter);
 
             int count = counter[0];
-
+            //we make a array of the size of the append buffer
             int[] data = new int[count];
-
+            //Get de data of the append buffer
             result.GetData(data);
-
+            //set data to list
             indexEdges.AddRange(data.Distinct().ToList());
-
+            //check if data = 0 or 1 that it is complete
             if(data.Length <= 1)
             {
                 loop = false;
             }
+            //make it ready to next check
             nextCheck.Clear();
             nextCheck.AddRange(data.Distinct().ToList());
+            //release compute buffer, append buffer
             result.Release();
             indexCheck.Release();
         }
@@ -223,7 +246,7 @@ public class GetExtrudeData : MonoBehaviour
         indexEdges = indexEdges.Distinct().ToList();
 
         extrude.Add(new ExtrudeData(indexEdges, CircleEdges[i]));
-
+        //reset if there are more edge circle
         if (CircleEdges.Count -1 != i)
         {
             i++;
@@ -231,6 +254,7 @@ public class GetExtrudeData : MonoBehaviour
             indexEdges.Clear();
             goto _L1;
         }
+        //release compute buffer
         countBuffer.Release();
         InsiteArrayBuffer.Release();
         indexABuffer?.Release();
