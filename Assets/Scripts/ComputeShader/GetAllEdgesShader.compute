@@ -18,7 +18,7 @@ RWStructuredBuffer<float3> vertices;
 AppendStructuredBuffer<data> Result;
 
 int index;
-
+//deze word niet gebruikt whand was niet veel sneller dan de andere manier
 [numthreads(32,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {

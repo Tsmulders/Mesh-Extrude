@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Edge
 {
+    
     public Vector3 A;
     public Vector3 B;
     public int indexA;
@@ -13,6 +14,7 @@ public class Edge
 
     // Creates an object that represents
     // a line from A to B (an edge)
+    //
     public Edge(Vector3 a, Vector3 b, int inA, int inB)
     {
         A = a;
@@ -21,6 +23,7 @@ public class Edge
         indexB = inB;
     }
 
+    //draw a red line between 2 points
     public void Draw()
     {
         Debug.DrawLine(A, B, Color.red, 1000);

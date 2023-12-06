@@ -39,7 +39,7 @@ bool _reverse;
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!    
-
+    //
     if (_reverse)
     {
         float3 ver = _vertices[id.x].vertex;

@@ -28,8 +28,8 @@ public class GetTriangles : MonoBehaviour
         //getall the triangles of the object
         alltrianglesList = getAllTiangles(mesh);
         List<Triangles> trianglesList = new List<Triangles>();
-        //
-        for (int i = 0;i < vertex.Length;i++)
+        //get triangles that are connected on the given index
+        for (int i = 0;i < vertex.Length; i++)
         {
             for (int j = 0; j < alltrianglesList.Count; j++)
             {
@@ -42,6 +42,7 @@ public class GetTriangles : MonoBehaviour
                 }
             }
         }
+        //return triangles
         return trianglesList;
     }
 

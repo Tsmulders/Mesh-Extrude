@@ -258,8 +258,8 @@ public class GetEdgesOfMesh : MonoBehaviour
 
         List<int> remove = new List<int>();
         //set x & y tread groups can not be higher than 65535
-        int xGroup = Mathf.RoundToInt((allEdges.Count / 32.0f));
-        int yGroup = Mathf.RoundToInt((allEdges.Count / 32.0f));
+        int xGroup = Mathf.RoundToInt((allEdges.Count / 30.0f));
+        int yGroup = Mathf.RoundToInt((allEdges.Count / 30.0f));
        
         int[] indexA = new int[allEdges.Count];
         int[] indexB = new int[allEdges.Count];
@@ -279,7 +279,7 @@ public class GetEdgesOfMesh : MonoBehaviour
         ComputeShader compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/GetEdgeOuterShader.compute");
         int _kernel = compute.FindKernel("CSMain3");
 
-        //ComputeBuffer result = new ComputeBuffer(allEdges.Count * 10, sizeof(int), ComputeBufferType.Append);
+        //ComputeBuffer result = new ComputeBuffer(allEdges.Count, sizeof(int), ComputeBufferType.Append);
         //result.SetCounterValue(0);
 
         //create compute buffer
@@ -343,6 +343,83 @@ public class GetEdgesOfMesh : MonoBehaviour
         //{
         //    allEdges.RemoveAt(remove[i]);
         //}
+
+        //please all outer edge in site a list
+        for (int i = 0; i < foundOne.Length; i++)
+        {
+            if (foundOne[i] == 0)
+            {
+                edges.Add(allEdges[i]);
+            }
+        }
+        //draw outer edge
+        foreach (Edge edge in edges)
+        {
+            edge.Draw();
+        }
+        //return outer edge
+        return edges;
+    }
+
+    public static List<Edge> GetEdges2(Mesh mesh, List<Edge> allEdges)
+    {
+
+        List<Edge> edges = new List<Edge>();
+
+        List<int> remove = new List<int>();
+        //set x & y tread groups can not be higher than 65535
+        int xGroup = Mathf.RoundToInt((allEdges.Count / 11.0f));
+        int yGroup = Mathf.RoundToInt((allEdges.Count / 92.0f));
+
+
+        Vector3[] positionA = new Vector3[allEdges.Count];
+        Vector3[] positionB = new Vector3[allEdges.Count];
+        int[] foundOne = new int[allEdges.Count];
+        //splits all Edges to different array
+        for (int i = 0; i < allEdges.Count; i++)
+        {
+            positionA[i] = allEdges[i].A;
+            positionB[i] = allEdges[i].B;
+            foundOne[i] = 0;
+        }
+        //get compute shader from map
+        ComputeShader compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/ComputeShader/GetEdgeOuterShader.compute");
+        int _kernel = compute.FindKernel("CSMain4");
+
+        //create compute buffer
+        ComputeBuffer positionABuffer = new ComputeBuffer(allEdges.Count, sizeof(float) * 3);
+        ComputeBuffer positionBBuffer = new ComputeBuffer(allEdges.Count, sizeof(float) * 3);
+        ComputeBuffer foundOneBuffer = new ComputeBuffer(allEdges.Count, sizeof(int));
+
+        //link buffer
+        compute.SetBuffer(_kernel, "positionA", positionABuffer);
+        compute.SetBuffer(_kernel, "positionB", positionBBuffer);
+        compute.SetBuffer(_kernel, "foundOne", foundOneBuffer);
+
+        //set data to compute buffers
+        positionABuffer.SetData(positionA);
+        positionBBuffer.SetData(positionB);
+        foundOneBuffer.SetData(foundOne);
+        compute.SetInt("count", allEdges.Count);
+
+        for (int i = 0; i < allEdges.Count / 65535; i++)
+        {
+            int allEdgesSplitsCount = allEdges.Count / 65535;
+
+            xGroup = Mathf.RoundToInt((allEdgesSplitsCount / 11.0f));
+
+            compute.SetInt("startpoint", allEdgesSplitsCount * i);
+            //dispatch to compute shader
+            compute.Dispatch(_kernel, xGroup, yGroup, 1);//5994528
+        }
+
+        //get data
+        foundOneBuffer.GetData(foundOne);
+
+        //release all compute buffers
+        positionABuffer.Release();
+        positionBBuffer.Release();
+        foundOneBuffer.Release();
 
         //please all outer edge in site a list
         for (int i = 0; i < foundOne.Length; i++)

@@ -26,13 +26,13 @@ public class GetExtrudeData : MonoBehaviour
                                                                             //edges = GetEdgesOfMesh.GetEdge(mesh, allEdges);
 
         //check if data is not null
-        if (edges == null || edges.Count == 0) return new ExtrudeData[0];
+        if (edges == null || edges.Count == 0 || edges.Count == allEdges.Count) return new ExtrudeData[0];
 
         //this wil make look if a outer edges is a Circle
         List<Edge[]> CircleEdges = new List<Edge[]>();
         CircleEdges = GetEdgeCircle(edges);
 
-        //check if it is a circle not a wrong triangle 
+        //check if it is a circle not a wrong triangle
         for (int i = 0; i < CircleEdges.Count; i++)
         {
             if (CircleEdges[i].Length <= 2)

@@ -19,11 +19,10 @@ float threshold;
 int firstVertices;
 
 AppendStructuredBuffer<int> Result;
-
+//get the  vertices that are on the same position
 [numthreads(32,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    
     float _distance = distance(_vertices[firstVertices], _vertices[id.x]);
     
     if (_distance <= threshold && firstVertices != id.x)
@@ -51,7 +50,7 @@ RWStructuredBuffer<int> triangles;
 int check;
 
 int setTo;
-
+//reassign the triangles 
 [numthreads(32, 1, 1)]
 void reassignTria3(uint3 id : SV_DispatchThreadID)
 {
