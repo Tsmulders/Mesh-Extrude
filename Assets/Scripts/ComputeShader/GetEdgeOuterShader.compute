@@ -103,23 +103,23 @@ void CSMain3(uint3 id : SV_DispatchThreadID)
     //}
 }
 
-int startpoint;
+int startPoint;
 
 [numthreads(11, 92, 1)]
 void CSMain4(uint3 id : SV_DispatchThreadID)
 {
     //checks the 2 positions on epsilon
-    if ((distance(positionA[startpoint + id.x], positionA[id.y]) <= Epsilon
+    if ((distance(positionA[startPoint + id.x], positionA[id.y]) <= Epsilon
         &&
-        distance(positionB[startpoint + id.x], positionB[id.y]) <= Epsilon)
+        distance(positionB[startPoint + id.x], positionB[id.y]) <= Epsilon)
         ||
-        (distance(positionA[startpoint + id.x], positionB[id.y]) <= Epsilon
+        (distance(positionA[startPoint + id.x], positionB[id.y]) <= Epsilon
         &&
-        distance(positionB[startpoint + id.x], positionA[id.y]) <= Epsilon))
+        distance(positionB[startPoint + id.x], positionA[id.y]) <= Epsilon))
     {
-        if (startpoint + id.x != id.y)
+        if (startPoint + id.x != id.y)
         {
-            foundOne[startpoint + id.x] = 1;
+            foundOne[startPoint + id.x] = 1;
         }
     }
 

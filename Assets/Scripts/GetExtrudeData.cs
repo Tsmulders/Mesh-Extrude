@@ -22,8 +22,8 @@ public class GetExtrudeData : MonoBehaviour
         }
         //get all outer edges of the mesh. 
         List<Edge> edges = new List<Edge>();
-        edges = GetEdgesOfMesh.GetEdges(mesh, allEdges);
-                                                                            //edges = GetEdgesOfMesh.GetEdge(mesh, allEdges);
+        edges = GetEdgesOfMesh.GetEdges2(mesh, allEdges);
+                                                            //edges = GetEdgesOfMesh.GetEdge(mesh, allEdges);
 
         //check if data is not null
         if (edges == null || edges.Count == 0 || edges.Count == allEdges.Count) return new ExtrudeData[0];
@@ -35,7 +35,7 @@ public class GetExtrudeData : MonoBehaviour
         //check if it is a circle not a wrong triangle
         for (int i = 0; i < CircleEdges.Count; i++)
         {
-            if (CircleEdges[i].Length <= 2)
+            if (CircleEdges[i].Length <= 3)
             {
                 CircleEdges.RemoveAt(i);
             }

@@ -402,15 +402,13 @@ public class GetEdgesOfMesh : MonoBehaviour
         foundOneBuffer.SetData(foundOne);
         compute.SetInt("count", allEdges.Count);
 
-        for (int i = 0; i < allEdges.Count / 65535; i++)
+        int allEdgesSplitsCount = allEdges.Count / 1000;
+        xGroup = Mathf.RoundToInt((allEdgesSplitsCount / 11.0f) + 0.5f);
+        for (int i = 0; i < allEdgesSplitsCount; i++)
         {
-            int allEdgesSplitsCount = allEdges.Count / 65535;
-
-            xGroup = Mathf.RoundToInt((allEdgesSplitsCount / 11.0f));
-
-            compute.SetInt("startpoint", allEdgesSplitsCount * i);
+            compute.SetInt("startPoint", allEdgesSplitsCount * i);
             //dispatch to compute shader
-            compute.Dispatch(_kernel, xGroup, yGroup, 1);//5994528
+            compute.Dispatch(_kernel, xGroup, yGroup, 1);
         }
 
         //get data

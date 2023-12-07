@@ -199,7 +199,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: fd06e94da5b233140a5c7cb17135f63d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -271,7 +271,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ef7a891b2ade113418f13bc018ad25b1, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -651,6 +651,92 @@ MonoBehaviour:
   extrudeStrength: 0.0001
   ar3: []
   welding: 0
+--- !u!1001 &1490882629
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_Name
+      value: 250000_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1490882631}
+  m_SourcePrefab: {fileID: 100100000, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+--- !u!1 &1490882630 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4d5d2c3249b9e7b44adf247432c4ad35, type: 3}
+  m_PrefabInstance: {fileID: 1490882629}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1490882631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1490882630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eab43749f868d8f44b0e9a03d7abe12d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triangle: 
+  threshold: 0.0001
+  extrudeStrength: 0
+  ar3: []
+  welding: 0
 --- !u!1 &1844697132
 GameObject:
   m_ObjectHideFlags: 0
@@ -978,3 +1064,4 @@ SceneRoots:
   - {fileID: 2117839370}
   - {fileID: 274934019}
   - {fileID: 332329904}
+  - {fileID: 1490882629}
