@@ -3,6 +3,7 @@
 #pragma kernel CSMain2
 #pragma kernel CSMain3
 #pragma kernel CSMain4
+#pragma kernel CSMain5
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
@@ -128,6 +129,32 @@ void CSMain4(uint3 id : SV_DispatchThreadID)
     //    result.Append(id.x);
     //}
 }
+
+
+[numthreads(8, 125, 1)]
+void CSMain5(uint3 id : SV_DispatchThreadID)
+{
+    //checks the 2 positions on epsilon
+    if ((distance(positionA[startPoint + id.x], positionA[id.y]) <= Epsilon
+        &&
+        distance(positionB[startPoint + id.x], positionB[id.y]) <= Epsilon)
+        ||
+        (distance(positionA[startPoint + id.x], positionB[id.y]) <= Epsilon
+        &&
+        distance(positionB[startPoint + id.x], positionA[id.y]) <= Epsilon))
+    {
+        if (startPoint + id.x != id.y)
+        {
+            foundOne[startPoint + id.x] = 1;
+        }
+    }
+
+    //if (id.y == count && foundOne[id.x] == 0)
+    //{
+    //    result.Append(id.x);
+    //}
+}
+
 
 //bool check(float3 v1, float3 v2)
 //{

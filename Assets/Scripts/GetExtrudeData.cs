@@ -22,7 +22,16 @@ public class GetExtrudeData : MonoBehaviour
         }
         //get all outer edges of the mesh. 
         List<Edge> edges = new List<Edge>();
-        edges = GetEdgesOfMesh.GetEdges2(mesh, allEdges);
+
+        if (allEdges.Count / 30 > 65535)
+        {
+            edges = GetEdgesOfMesh.GetEdges2(mesh, allEdges);
+        }
+        else
+        {
+            edges = GetEdgesOfMesh.GetEdges(mesh, allEdges);
+        }
+
                                                             //edges = GetEdgesOfMesh.GetEdge(mesh, allEdges);
 
         //check if data is not null
@@ -213,7 +222,11 @@ public class GetExtrudeData : MonoBehaviour
             indexCheck.SetData(nextCheck.ToArray());
             compute.SetInt("max", nextCheck.Count);
             //dispatch to compute shaders
-            compute.Dispatch(_kernel, xGroup, yGroup, 1);
+            if (xGroup < 65535 && yGroup < 65535)
+            {
+                compute.Dispatch(_kernel, xGroup, yGroup, 1);
+            }
+            
             //will copy the count of the append buffer
             ComputeBuffer.CopyCount(result, countBuffer, 0);
             
