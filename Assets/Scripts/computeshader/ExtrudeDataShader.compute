@@ -1,11 +1,12 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
+#pragma kernel CSMain2
 
 RWStructuredBuffer<int> AIndex;
 RWStructuredBuffer<int> BIndex;
 RWStructuredBuffer<int> indexCheck;
 
-AppendStructuredBuffer<int> Result;
+//AppendStructuredBuffer<int> Result;
 
 RWStructuredBuffer<int> InsiteArray;
 
@@ -23,21 +24,40 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         if (indexCheck[id.x] == AIndex[id.y] && InsiteArray[BIndex[id.y]] == 0)
         {
             //add to appended buffer sort of list
-            Result.Append(BIndex[id.y]);
+            //Result.Append(BIndex[id.y]);
             InsiteArray[BIndex[id.y]] = 1;
             //count[0]++;
         }
         if (indexCheck[id.x] == BIndex[id.y] && InsiteArray[AIndex[id.y]] == 0)
         {
             //add to appended buffer sort of list
-            Result.Append(AIndex[id.y]);
+            //Result.Append(AIndex[id.y]);
             InsiteArray[AIndex[id.y]] = 1;
             //count[0]++;
         }
     }
 }
 
-int nice()
+[numthreads(1, 91, 1)]
+void CSMain2(uint3 id : SV_DispatchThreadID)
 {
-    return 1;
+    //make sure is not over the max intergresions
+    if (id.x <= max)
+    {
+        //looks if it is comnectet to other vertices
+        if (indexCheck[id.x] == AIndex[id.y] && InsiteArray[BIndex[id.y]] == 0)
+        {
+            //add to appended buffer sort of list
+            //Result.Append(BIndex[id.y]);
+            InsiteArray[BIndex[id.y]] = 1;
+            //count[0]++;
+        }
+        if (indexCheck[id.x] == BIndex[id.y] && InsiteArray[AIndex[id.y]] == 0)
+        {
+            //add to appended buffer sort of list
+            //Result.Append(AIndex[id.y]);
+            InsiteArray[AIndex[id.y]] = 1;
+            //count[0]++;
+        }
+    }
 }

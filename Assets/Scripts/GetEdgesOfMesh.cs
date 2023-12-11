@@ -410,7 +410,7 @@ public class GetEdgesOfMesh : MonoBehaviour
             //dispatch to compute shader
             compute.Dispatch(_kernel, xGroup, yGroup, 1);
         }
-
+        
         //get data
         foundOneBuffer.GetData(foundOne);
 
