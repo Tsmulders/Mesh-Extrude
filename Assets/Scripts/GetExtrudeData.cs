@@ -312,7 +312,7 @@ public class GetExtrudeData : MonoBehaviour
         int _kernel = compute.FindKernel("CSMain2");
         //set y treat group
         yGroup = Mathf.RoundToInt((allEdges.Count / 91.0f));
-        Debug.Log(yGroup);
+        //Debug.Log(yGroup);
 
         //create compute buffers
         ComputeBuffer countBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.IndirectArguments);
@@ -335,6 +335,7 @@ public class GetExtrudeData : MonoBehaviour
         //set compute buffer data
         indexABuffer.SetData(indexA);
         indexBBuffer.SetData(indexB);
+        compute.SetInt("maxY", allEdges.Count);
 
     //back point
     _L1:
@@ -372,6 +373,7 @@ public class GetExtrudeData : MonoBehaviour
             //set compute buffer data
             indexCheck.SetData(nextCheck.ToArray());
             compute.SetInt("max", nextCheck.Count);
+            
             //dispatch to compute shaders
             if (xGroup < 65535 && yGroup < 65535)
             {
