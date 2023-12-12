@@ -6,7 +6,7 @@ RWStructuredBuffer<int> AIndex;
 RWStructuredBuffer<int> BIndex;
 RWStructuredBuffer<int> indexCheck;
 
-//AppendStructuredBuffer<int> Result;
+AppendStructuredBuffer<int> Result;
 
 RWStructuredBuffer<int> InsiteArray;
 
@@ -24,14 +24,14 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         if (indexCheck[id.x] == AIndex[id.y] && InsiteArray[BIndex[id.y]] == 0)
         {
             //add to appended buffer sort of list
-            //Result.Append(BIndex[id.y]);
+            Result.Append(BIndex[id.y]);
             InsiteArray[BIndex[id.y]] = 1;
             //count[0]++;
         }
         if (indexCheck[id.x] == BIndex[id.y] && InsiteArray[AIndex[id.y]] == 0)
         {
             //add to appended buffer sort of list
-            //Result.Append(AIndex[id.y]);
+            Result.Append(AIndex[id.y]);
             InsiteArray[AIndex[id.y]] = 1;
             //count[0]++;
         }
@@ -48,14 +48,14 @@ void CSMain2(uint3 id : SV_DispatchThreadID)
         if (indexCheck[id.x] == AIndex[id.y] && InsiteArray[BIndex[id.y]] == 0)
         {
             //add to appended buffer sort of list
-            //Result.Append(BIndex[id.y]);
+            Result.Append(BIndex[id.y]);
             InsiteArray[BIndex[id.y]] = 1;
             //count[0]++;
         }
         if (indexCheck[id.x] == BIndex[id.y] && InsiteArray[AIndex[id.y]] == 0)
         {
             //add to appended buffer sort of list
-            //Result.Append(AIndex[id.y]);
+            Result.Append(AIndex[id.y]);
             InsiteArray[AIndex[id.y]] = 1;
             //count[0]++;
         }
