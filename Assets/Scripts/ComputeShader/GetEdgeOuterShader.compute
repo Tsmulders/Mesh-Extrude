@@ -8,15 +8,15 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 
-struct data
-{
-    float3 A;
-    float3 B;
-    int indexA;
-    int indexB;
-};
+//struct data
+//{
+//    float3 A;
+//    float3 B;
+//    int indexA;
+//    int indexB;
+//};
 
-RWStructuredBuffer<data> edges;
+//RWStructuredBuffer<data> edges;
 
 RWStructuredBuffer<int> indexA;
 RWStructuredBuffer<int> indexB;
@@ -28,49 +28,49 @@ RWStructuredBuffer<int> foundOne;
 
 //RWStructuredBuffer<float3> positionBCheck;
 
-AppendStructuredBuffer<int> result;
+//AppendStructuredBuffer<int> result;
 
 
 
 
 
-[numthreads(15, 15,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
-{
-    if ((indexA[id.x] == indexA[id.y] &&
-        indexB[id.x] == indexB[id.y]) ||
-        (indexA[id.x] == indexB[id.y] &&
-        indexB[id.x] == indexA[id.y]))
-    {
-        if (id.x != id.y)
-        {
-            result.Append(id.x);
-        }
-    }
-}
+//[numthreads(15, 15,1)]
+//void CSMain (uint3 id : SV_DispatchThreadID)
+//{
+//    if ((indexA[id.x] == indexA[id.y] &&
+//        indexB[id.x] == indexB[id.y]) ||
+//        (indexA[id.x] == indexB[id.y] &&
+//        indexB[id.x] == indexA[id.y]))
+//    {
+//        if (id.x != id.y)
+//        {
+//            result.Append(id.x);
+//        }
+//    }
+//}
 
 
-[numthreads(15, 15, 1)]
-void CSMain2(uint3 id : SV_DispatchThreadID)
-{
+//[numthreads(15, 15, 1)]
+//void CSMain2(uint3 id : SV_DispatchThreadID)
+//{
     
-    if ((indexA[id.x] == indexA[id.y] &&
-        indexB[id.x] == indexB[id.y]) ||
-        (indexA[id.x] == indexB[id.y] &&
-        indexB[id.x] == indexA[id.y]))
-    {
-        if (id.x != id.y)
-        {
-            foundOne[id.x] = 1;
+//    if ((indexA[id.x] == indexA[id.y] &&
+//        indexB[id.x] == indexB[id.y]) ||
+//        (indexA[id.x] == indexB[id.y] &&
+//        indexB[id.x] == indexA[id.y]))
+//    {
+//        if (id.x != id.y)
+//        {
+//            foundOne[id.x] = 1;
 
-        }
-    }
+//        }
+//    }
    
-    if (id.y == 134700 && foundOne[id.x] == 0)
-    {
-        result.Append(id.x);
-    }
-}
+//    if (id.y == 134700 && foundOne[id.x] == 0)
+//    {
+//        result.Append(id.x);
+//    }
+//}
 
 
 RWStructuredBuffer<float3> positionA;
@@ -78,6 +78,8 @@ RWStructuredBuffer<float3> positionB;
 
 int count;
 float Epsilon;
+
+int max;
 
 //get outer edge
 [numthreads(30, 30, 1)]
@@ -130,29 +132,28 @@ void CSMain4(uint3 id : SV_DispatchThreadID)
     //}
 }
 
+int startPointY;
 
-[numthreads(8, 125, 1)]
+[numthreads(32, 32, 1)]
 void CSMain5(uint3 id : SV_DispatchThreadID)
 {
-    //checks the 2 positions on epsilon
-    if ((distance(positionA[startPoint + id.x], positionA[id.y]) <= Epsilon
-        &&
-        distance(positionB[startPoint + id.x], positionB[id.y]) <= Epsilon)
-        ||
-        (distance(positionA[startPoint + id.x], positionB[id.y]) <= Epsilon
-        &&
-        distance(positionB[startPoint + id.x], positionA[id.y]) <= Epsilon))
+    if (id.x <= max && id.y <= max)
     {
-        if (startPoint + id.x != id.y)
+        //checks the 2 positions on epsilon
+        if ((distance(positionA[startPoint + id.x], positionA[startPointY + id.y]) <= Epsilon
+            &&
+            distance(positionB[startPoint + id.x], positionB[startPointY + id.y]) <= Epsilon)
+            ||
+            (distance(positionA[startPoint + id.x], positionB[startPointY + id.y]) <= Epsilon
+            &&
+            distance(positionB[startPoint + id.x], positionA[startPointY + id.y]) <= Epsilon))
         {
-            foundOne[startPoint + id.x] = 1;
+            if (startPoint + id.x != id.y)
+            {
+                foundOne[startPoint + id.x] = 1;
+            }
         }
     }
-
-    //if (id.y == count && foundOne[id.x] == 0)
-    //{
-    //    result.Append(id.x);
-    //}
 }
 
 

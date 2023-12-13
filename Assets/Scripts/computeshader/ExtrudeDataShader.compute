@@ -43,7 +43,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 void CSMain2(uint3 id : SV_DispatchThreadID)
 {
     //make sure is not over the max intergresions
-    if (id.x <= max)
+    if (id.x <= max && id.y <= maxY)
     {
         //looks if it is comnectet to other vertices
         if (indexCheck[id.x] == AIndex[id.y] && InsiteArray[BIndex[id.y]] == 0)

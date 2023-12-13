@@ -193,6 +193,7 @@ public class GetExtrudeData : MonoBehaviour
         //set compute buffer data
         indexABuffer.SetData(indexA);
         indexBBuffer.SetData(indexB);
+        compute.SetInt("maxY", allEdges.Count);
 
     //back point
     _L1:
