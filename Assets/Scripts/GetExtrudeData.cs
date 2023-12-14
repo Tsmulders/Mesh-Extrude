@@ -20,18 +20,22 @@ public class GetExtrudeData : MonoBehaviour
         {
             return new ExtrudeData[0];
         }
-        //get all outer edges of the mesh. 
+        
         List<Edge> edges = new List<Edge>();
 
+        //check if is compatible for witch compute shader
+        //30 is the number of available treats if the workload than is above 65535 that the compute shader wil not work.
+        //than it will take the code that wil splits it up smaller tasks.
         if (allEdges.Count / 30 > 65535)
         {
+            //get all outer edges of the mesh. 
             edges = GetEdgesOfMesh.GetEdges2(mesh, allEdges);
         }
         else
         {
+            //get all outer edges of the mesh. 
             edges = GetEdgesOfMesh.GetEdges(mesh, allEdges);
         }
-
                                                             //edges = GetEdgesOfMesh.GetEdge(mesh, allEdges);
 
         //check if data is not null
@@ -52,14 +56,17 @@ public class GetExtrudeData : MonoBehaviour
         //check if data is not null
         if (CircleEdges.Count == 0) return new ExtrudeData[0];
 
-        //will get all vertices that needs to be extruded
-
+        //check if is compatible for witch compute shader
+        //32 is the number of available treats if the workload than is above 65535 that the compute shader wil not work.
+        //than it will take the code that wil splits it up smaller tasks.
         if (allEdges.Count / 32 > 65535)
         {
+            //will get all vertices that needs to be extruded
             return GetVertices91(CircleEdges, allEdges, mesh);
         }
         else
         {
+            //will get all vertices that needs to be extruded
             return GetVertices(CircleEdges, allEdges, mesh);
         }
     }
