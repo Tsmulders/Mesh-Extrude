@@ -20,7 +20,7 @@ public class ComputeShaderTestC : MonoBehaviour
 
     [Header("compute shader")]
 
-    ComputeShader compute;
+    [SerializeField] ComputeShader compute;
     [SerializeField] ComputeBuffer _meshPropertiesBuffer;
 
 
@@ -48,13 +48,13 @@ public class ComputeShaderTestC : MonoBehaviour
     {
 
         compute = AssetDatabase.LoadAssetAtPath<ComputeShader>("Assets/Scripts/voorbeeldCode/test/ComputeShaderTest.compute");
-        for (int i = 0; i < 3; i++)
-        {
-            test2();
-        }
+        //for (int i = 0; i < 3; i++)
+        //{
+        //    test2();
+        //}
 
-        //_kernel = compute.FindKernel("CSMain");
-        //UpdateBuffers();
+        _kernel = compute.FindKernel("CSMain");
+        UpdateBuffers();
     }
 
     private void UpdateBuffers()
@@ -85,22 +85,22 @@ public class ComputeShaderTestC : MonoBehaviour
     //Update is called once per frame
     void Update()
     {
-        //  test1();
+        test1();
     }
 
     //verandere van color texture
-    //    void Update()
-    //    {
-    //        int kernel = compute.FindKernel("CSMain");
+    //void Update()
+    //{
+    //    int kernel = compute.FindKernel("CSMain");
 
-    //        result = new RenderTexture(1032, 1032, 240);
-    //        result.enableRandomWrite = true;
-    //        result.Create();
+    //    result = new RenderTexture(1032, 1032, 240);
+    //    result.enableRandomWrite = true;
+    //    result.Create();
 
-    //        compute.SetTexture(kernel, "Result", result);
-    //        compute.SetVector("color", coler);
-    //        compute.Dispatch(kernel, result.width / 8, result.height / 8, 1);
-    //    }
+    //    compute.SetTexture(kernel, "Result", result);
+    //    compute.SetVector("color", coler);
+    //    compute.Dispatch(kernel, result.width / 8, result.height / 8, 1);
+    //}
 
     void test1()
     {
