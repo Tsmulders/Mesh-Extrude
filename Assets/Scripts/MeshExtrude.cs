@@ -13,16 +13,16 @@ public class MeshExtrude : MonoBehaviour
     private List<Mesh> listMech;
     private Vector3[] normals;
 
-    //debug test 
-    public int[] triangle;
 
-    public float threshold = 0.0001f;
-    public float extrudeStrength = 0;
+    private int[] triangle;
 
-    ExtrudeData[] extrudeVertex; 
+    float threshold = 0.0001f;
+    float extrudeStrength = 0;
+
+    ExtrudeData[] extrudeVertex;
     int countVer1;
 
-    public Vector3[] ar3;
+    Vector3[] ar3;
 
     [SerializeField] private bool welding;
     // Start is called before the first frame update
@@ -43,7 +43,7 @@ public class MeshExtrude : MonoBehaviour
                 Extrude(transform.GetChild(i).gameObject);
             }
         }
-        //check if main object has a mech filter 
+        //check if main object has a mech filter
         if (GetComponent<MeshFilter>() != null)
         {
             Extrude(gameObject);
@@ -107,16 +107,19 @@ public class MeshExtrude : MonoBehaviour
         }
         //Recalculate the Mesh (Normals, Tangents, Bounds, UVDistributionMetrics)
         RecalculateMesh(mesh);
+
     }
 
 
     void RecalculateMesh(Mesh meshRecalculate)
     {
         //Recalculate the Mesh
-        meshRecalculate.RecalculateNormals();
-        meshRecalculate.RecalculateTangents();
-        meshRecalculate.RecalculateBounds();
-        meshRecalculate.RecalculateUVDistributionMetrics();
+        //meshRecalculate.RecalculateNormals();
+        //meshRecalculate.RecalculateTangents();
+
+        //meshRecalculate.RecalculateBounds();
+        //meshRecalculate.RecalculateUVDistributionMetrics();
+        TB.NormalSolver.RecalculateNormals(meshRecalculate, 45.0f);
     }
 
     private Mesh cloneMesh(Mesh original, int[] verticesIndex, float extrudeStrength)
